@@ -1,23 +1,33 @@
+---
+import '../styles/global.css';
+
+interface Props {
+	title: string;
+	description?: string;
+}
+
+const { title, description = "周孟翰醫師 - 新店高美泌尿科診所院長，泌尿科專科醫師。" } = Astro.props;
+---
+
 <!doctype html>
-<html lang="en">
+<html lang="zh-TW">
 	<head>
 		<meta charset="UTF-8" />
+		<meta name="description" content={description} />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		<title>{title}</title>
 	</head>
-	<body>
-		<slot />
+	<body class="flex flex-col min-h-screen">
+        <!-- 導覽列 Slot -->
+		<slot name="header" /> 
+		
+        <main class="flex-grow">
+			<slot />
+		</main>
+
+        <!-- 頁尾 Slot -->
+		<slot name="footer" />
 	</body>
 </html>
-
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>
