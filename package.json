@@ -1,0 +1,26 @@
+{
+  "name": "drcmh-site-v2",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/partytown": "^2.1.4",
+    "@astrojs/react": "^4.4.2",
+    "@astrojs/sitemap": "^3.7.0",
+    "@keystatic/astro": "^5.0.6",
+    "@keystatic/core": "^0.5.48",
+    "@tailwindcss/vite": "^4.1.18",
+    "@types/react": "^19.2.10",
+    "@types/react-dom": "^19.2.3",
+    "astro": "^5.17.1",
+    "lucide-react": "^0.563.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tailwindcss": "^4.1.18"
+  }
+}
