@@ -1,0 +1,63 @@
+---
+import { Calendar, MapPin, ArrowRight } from 'lucide-react';
+
+// 模擬醫師資料 (也可從 Keystatic Singleton 讀取)
+const doctor = {
+  name: "周孟翰",
+  title: "院長",
+  clinic: "新店高美泌尿科診所",
+  image: "/images/doctor-avatar-placeholder.png", // 建議準備一張方形大頭照
+  intro: "致力於透過細膩的溝通與精準的治療，協助您卸下心理負擔，重拾自信生活。"
+};
+---
+
+<aside class="space-y-8 sticky top-24">
+  
+  {/* 1. 醫師簡介卡片 */}
+  <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm text-center">
+    <div class="w-24 h-24 mx-auto rounded-full bg-highlight overflow-hidden mb-4 border-4 border-white shadow-md">
+      {/* 這裡之後換成真實大頭照 */}
+      <div class="w-full h-full flex items-center justify-center text-accent text-2xl font-bold bg-bg">
+         周
+      </div>
+      {/* <img src={doctor.image} alt={doctor.name} class="w-full h-full object-cover" /> */}
+    </div>
+    
+    <h3 class="text-xl font-serif font-bold text-primary mb-1">
+      {doctor.name} <span class="text-sm font-sans font-normal text-text">{doctor.title}</span>
+    </h3>
+    <p class="text-xs font-bold text-accent tracking-wider uppercase mb-4">
+      {doctor.clinic}
+    </p>
+    
+    <p class="text-sm text-text/80 leading-relaxed mb-6 text-justify">
+      {doctor.intro}
+    </p>
+
+    <a 
+      href="/#about" 
+      class="text-sm font-bold text-primary hover:text-accent transition-colors flex items-center justify-center gap-1 group"
+    >
+      完整學經歷 <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform"/>
+    </a>
+  </div>
+
+  {/* 2. 預約 CTA 卡片 */}
+  <div class="bg-primary rounded-2xl p-6 text-white text-center shadow-lg relative overflow-hidden group">
+    {/* 裝飾背景 */}
+    <div class="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full blur-xl -translate-y-1/2 translate-x-1/2"></div>
+    
+    <h3 class="text-lg font-bold mb-2 relative z-10">受夠了頻尿困擾？</h3>
+    <p class="text-sm text-gray-300 mb-6 relative z-10">
+      別讓症狀影響生活品質，立即預約諮詢。
+    </p>
+    
+    <a 
+      href="/#clinic" 
+      class="block w-full py-3 bg-accent hover:bg-white hover:text-primary text-white font-bold rounded-xl transition-all shadow-md active:scale-95 relative z-10"
+    >
+      預約門診
+    </a>
+  </div>
+
+</aside>

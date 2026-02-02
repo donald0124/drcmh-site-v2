@@ -1,22 +1,190 @@
 ---
-// src/pages/blog/[slug].astro
 import { getCollection } from 'astro:content';
-import MarkdownLayout from '../../layouts/MarkdownLayout.astro';
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/common/Header.astro';
+import Footer from '../../components/common/Footer.astro';
+import Sidebar from '../../components/blog/Sidebar.astro';
+import TableOfContents from '../../components/blog/TableOfContents.astro';
+import BlogCard from '../../components/blog/BlogCard.astro';
+import { Image } from 'astro:assets';
+import { Calendar, Tag, ChevronLeft, User, Clock } from 'lucide-react';
 
-// 1. 生成所有文章的路徑 (Static Site Generation 需要)
+// 1. 生成靜態路徑 (Static Paths)
 export async function getStaticPaths() {
   const posts = await getCollection('posts');
-  return posts.map(post => ({
+  return posts.map((post) => ({
     params: { slug: post.slug },
     props: { post },
   }));
 }
 
-// 2. 獲取當前文章資料
 const { post } = Astro.props;
-const { Content } = await post.render();
+const { Content, headings } = await post.render();
+
+// 2. 獲取相關文章邏輯
+const allPosts = await getCollection('posts');
+const relatedPosts = allPosts
+  .filter((p) => p.slug !== post.slug) // 排除自己
+  .map((p) => {
+    // 計算標籤交集數量作為關聯分數
+    const intersection = p.data.tags.filter((tag) => post.data.tags.includes(tag));
+    return { ...p, score: intersection.length };
+  })
+  .filter((p) => p.score > 0) // 只留有關聯的
+  .sort((a, b) => b.score - a.score || b.data.date.valueOf() - a.data.date.valueOf()) // 分數高優先，同分則日期新優先
+  .slice(0, 3); // 取前 3 篇
+
+// 格式化日期
+const formattedDate = post.data.date.toISOString().split('T')[0].replace(/-/g, '.');
 ---
 
-<MarkdownLayout frontmatter={post.data}>
-  <Content />
-</MarkdownLayout>
+<Layout 
+  title={`${post.data.title} | 周孟翰醫師`}
+  description={post.data.excerpt}
+  image={post.data.coverImage?.src}
+>
+  <Header slot="header" />
+
+  {/* Progress Bar (閱讀進度條) */}
+  <div class="fixed top-0 left-0 w-full h-1 bg-transparent z-50">
+    <div class="h-full bg-accent w-0" id="progress-bar"></div>
+  </div>
+
+  <article class="pt-24 md:pt-32 pb-16 bg-bg min-h-screen">
+    
+    {/* 1. 文章 Header (Hero) */}
+    <header class="container mx-auto px-6 mb-12 max-w-5xl">
+      {/* 麵包屑導覽 */}
+      <div class="flex items-center gap-2 text-sm text-text/60 mb-6">
+        <a href="/" class="hover:text-primary transition-colors">首頁</a>
+        <span>/</span>
+        <a href="/blog" class="hover:text-primary transition-colors">衛教專欄</a>
+        <span>/</span>
+        <span class="text-accent truncate max-w-[200px]">{post.data.title}</span>
+      </div>
+
+      <div class="flex flex-col gap-6">
+        {/* 標籤 */}
+        <div class="flex flex-wrap gap-2">
+           {post.data.tags.map(tag => (
+             <span class="bg-white px-3 py-1 rounded-full text-xs font-bold text-accent shadow-sm border border-accent/20">
+               #{tag}
+             </span>
+           ))}
+        </div>
+
+        {/* 主標題 */}
+        <h1 class="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-primary leading-tight">
+          {post.data.title}
+        </h1>
+
+        {/* Meta 資訊 */}
+        <div class="flex items-center gap-6 text-sm text-text/70 border-b border-primary/10 pb-8">
+           <div class="flex items-center gap-2">
+             <Calendar size={16} />
+             <span>{formattedDate}</span>
+           </div>
+           <div class="flex items-center gap-2">
+             <User size={16} />
+             <span>周孟翰 醫師</span>
+           </div>
+           <div class="flex items-center gap-2">
+             <Clock size={16} />
+             <span>約 {Math.ceil(post.body.length / 500)} 分鐘閱讀</span>
+           </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="container mx-auto px-6 max-w-6xl">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        
+        {/* 2. 主要內容區 (8欄) */}
+        <div class="lg:col-span-8">
+          
+          {/* 封面圖 */}
+          {post.data.coverImage && (
+            <div class="rounded-2xl overflow-hidden shadow-lg mb-10 aspect-video bg-gray-200">
+               <Image 
+                 src={post.data.coverImage} 
+                 alt={post.data.title}
+                 class="w-full h-full object-cover"
+               />
+            </div>
+          )}
+
+          {/* 手機版目錄 (只在手機顯示) */}
+          <div class="lg:hidden mb-8">
+             <TableOfContents headings={headings} />
+          </div>
+
+          {/* MDX 內容 (Typography) */}
+          <div class="prose prose-lg prose-slate max-w-none 
+              prose-headings:font-serif prose-headings:text-primary prose-headings:font-bold
+              prose-p:text-text prose-p:leading-loose
+              prose-a:text-accent prose-a:no-underline hover:prose-a:underline
+              prose-blockquote:border-accent prose-blockquote:bg-surface prose-blockquote:py-2 prose-blockquote:px-6 prose-blockquote:not-italic prose-blockquote:rounded-r-lg
+              prose-li:marker:text-accent
+              prose-img:rounded-xl prose-img:shadow-md
+              bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-transparent"
+          >
+             <Content />
+          </div>
+
+          {/* 文末 CTA */}
+          <div class="mt-12 p-8 bg-highlight/30 rounded-2xl border border-highlight text-center">
+             <h3 class="text-xl font-serif font-bold text-primary mb-2">還有其他疑問嗎？</h3>
+             <p class="text-text mb-6">每個人的狀況都不盡相同，歡迎來到診間，讓我為您做詳細的檢查與評估。</p>
+             <a href="/#clinic" class="inline-flex items-center gap-2 px-8 py-3 bg-primary text-white font-bold rounded-full hover:bg-accent transition-colors shadow-lg">
+                立即預約掛號
+             </a>
+          </div>
+
+        </div>
+
+        {/* 3. 側邊欄 (4欄) - 桌機顯示 */}
+        <aside class="hidden lg:block lg:col-span-4">
+           {/* 目錄 */}
+           <TableOfContents headings={headings} />
+           
+           {/* 醫師介紹與 CTA */}
+           <Sidebar />
+        </aside>
+
+      </div>
+    </div>
+    
+    {/* 4. 相關文章推薦 */}
+    {relatedPosts.length > 0 && (
+      <section class="mt-24 pt-16 border-t border-gray-200 bg-surface">
+         <div class="container mx-auto px-6 max-w-6xl">
+            <h2 class="text-2xl font-serif font-bold text-primary mb-8 flex items-center gap-3">
+              <div class="w-1 h-8 bg-accent rounded-full"></div>
+              延伸閱讀
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+               {relatedPosts.map(p => (
+                 <BlogCard post={p} />
+               ))}
+            </div>
+         </div>
+      </section>
+    )}
+
+  </article>
+
+  <Footer slot="footer" />
+</Layout>
+
+<script>
+  // 閱讀進度條邏輯
+  window.addEventListener('scroll', () => {
+    const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const scrolled = (winScroll / height) * 100;
+    const progressBar = document.getElementById("progress-bar");
+    if (progressBar) {
+      progressBar.style.width = scrolled + "%";
+    }
+  });
+</script>
