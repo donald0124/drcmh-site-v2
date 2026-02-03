@@ -1,6 +1,7 @@
 import { config, fields, collection, singleton } from '@keystatic/core';
 
 export default config({
+    // 開發模式使用 local，上線使用 github
   storage: import.meta.env.PROD
     ? {
         kind: 'github',

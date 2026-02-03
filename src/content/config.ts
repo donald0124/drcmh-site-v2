@@ -1,6 +1,8 @@
 import { defineCollection, z } from 'astro:content';
 
-const posts = defineCollection({
+// 1. 文章集合
+// 修正重點：變數名稱必須定義為 'blog'
+const blog = defineCollection({
   type: 'content', 
   schema: ({ image }) => z.object({
     title: z.string(),
@@ -11,6 +13,7 @@ const posts = defineCollection({
   }),
 });
 
+// 2. 全站設定 (Singleton)
 const settings = defineCollection({
   type: 'data',
   schema: z.object({
@@ -22,6 +25,7 @@ const settings = defineCollection({
   }),
 });
 
+// 3. 門診表 (Singleton)
 const schedule = defineCollection({
   type: 'data',
   schema: z.object({
@@ -30,8 +34,9 @@ const schedule = defineCollection({
   }),
 });
 
+// 匯出設定
 export const collections = { 
-    'posts': posts,
+    'blog': blog,      // 這裡參照上方的 const blog
     'settings': settings,
     'schedule': schedule
 };
