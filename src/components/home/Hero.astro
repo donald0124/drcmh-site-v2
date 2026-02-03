@@ -1,6 +1,7 @@
 ---
 import { ArrowRight, Activity, Award } from 'lucide-react';
 import { Image } from 'astro:assets';
+import doctorProfile from '../../assets/drchou-profile-2.png';
 
 // 暫時使用 Placeholder 圖片，實際上線時請替換為真實的醫師去背 PNG
 // 請確保有一張 src/assets/doctor-hero.png (或 jpg)
@@ -8,12 +9,12 @@ const doctorImage = "/images/doctor-placeholder.png"; // 假設放在 public/ima
 
 // 文案資料 (源自 PRD v3.1)
 const content = {
-  tag: "PERSONAL BRAND",
+  tag: "Dr. Chou Meng-Han",
   name: "周孟翰",
   title: "醫師",
   subTitle: "新店高美泌尿科診所 院長",
   slogan: "讓難以啟齒的煩惱，變成輕鬆自在的日常",
-  intro: "醫學的進步，是為了提供更多元的選擇。在我的診間，我將透過充分的溝通與尖端技術，協助您找到最符合生活型態的最佳解。",
+  intro: "在診間，沒有尷尬的提問，只有專業的傾聽。我們致力於透過細膩的溝通與精準的治療，協助您卸下心理負擔，重拾自信與舒適的生活步調",
 };
 ---
 
@@ -89,33 +90,16 @@ const content = {
              {/* 模擬人物 (Placeholder) */}
              <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[120%] h-auto">
                 {/* 備註：HTML/Astro 元件繼續使用 class */}
-                <img 
-                  src="/images/doctor-placeholder.png" 
-                  alt="周孟翰醫師形象照" 
+                <Image 
+                  src={doctorProfile}
+                  alt="周孟翰醫師專業形象照" 
                   class="w-full h-full object-cover object-top mask-image-gradient"
                   loading="eager"
                 />
-                <div class="absolute inset-0 flex items-center justify-center text-primary/20 font-serif text-4xl font-bold opacity-30">
-                   Doctor Image
-                </div>
+
              </div>
 
-             {/* 浮動特色卡片 (微創手術) */}
-             <div class="absolute bottom-8 left-4 md:-left-8 bg-white/90 backdrop-blur-md p-5 rounded-2xl shadow-xl border-l-4 border-accent max-w-[280px] animate-float">
-                <div class="flex items-start gap-4">
-                   <div class="p-3 bg-bg rounded-full text-accent shadow-inner">
-                      {/* Activity 若沒有特別樣式，保持原樣即可；若有樣式也需用 className */}
-                      <Activity size={24} />
-                   </div>
-                   <div>
-                      <h4 class="font-bold text-primary mb-1">精準微創治療</h4>
-                      <p class="text-xs text-text leading-relaxed">
-                         攝護腺水蒸氣消融 (Rezūm) <br/>
-                         UroLift 拉提手術
-                      </p>
-                   </div>
-                </div>
-             </div>
+
 
           </div>
           

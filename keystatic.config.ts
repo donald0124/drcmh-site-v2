@@ -24,10 +24,42 @@ export default config({
 
   singletons: {
     settings: singleton({
-      label: '全站資訊 (電話/連結)',
+      label:'全站資訊 & 醫師資料',
       path: 'src/content/settings/global',
       schema: {
-        clinicName: fields.text({ label: '診所名稱', defaultValue: '新店高美泌尿科診所' }),
+        // --- 1. 醫師基本資料 ---
+        doctorName: fields.text({ label: '醫師姓名', defaultValue: '周孟翰' }),
+        doctorTitle: fields.text({ label: '醫師職稱', defaultValue: '院長' }),
+        clinicName: fields.text({ label: '診所名稱', defaultValue: '新店高美泌尿科診所' }), // 原本就有的
+        
+        // --- 2. 圖片設定 (關鍵：存到 src/assets 以利優化) ---
+        avatar: fields.image({
+          label: '醫師大頭照 (方形)',
+          description: '建議上傳 1:1 方形照片，顯示於側邊欄。',
+          // 存到 src/assets/images 資料夾
+          directory: 'src/assets/images', 
+          // 在 YAML 檔中寫入的相對路徑 (從 src/content/settings/ 往外找)
+          publicPath: '../../assets/images', 
+        }),
+
+        // --- 3. 文案設定 ---
+        slogan: fields.text({ 
+            label: '首頁 Slogan (標語)', 
+            defaultValue: '讓難以啟齒的煩惱，變成輕鬆自在的日常' 
+        }),
+        heroIntro: fields.text({ 
+            label: '首頁 Hero 介紹文', 
+            multiline: true,
+            defaultValue: '在診間，沒有尷尬的提問，只有專業的傾聽...' 
+        }),
+        sidebarIntro: fields.text({ 
+            label: '側邊欄簡介 (Sidebar)', 
+            multiline: true,
+            description: '顯示於文章側邊欄的短介紹',
+            defaultValue: '致力於透過細膩的溝通與精準的治療，協助您卸下心理負擔，重拾自信生活。' 
+        }),
+        
+        // --- 4. 其他診所資訊 ---
         phone: fields.text({ label: '預約電話' }),
         address: fields.text({ label: '診所地址' }),
         bookingLink: fields.url({ label: '線上掛號連結' }),
@@ -35,6 +67,14 @@ export default config({
             label: '頂部公告欄 (選填)', 
             description: '例如：颱風天休診公告，留空則不顯示' 
         }),
+
+        // 👇👇👇 新增這個墊高用欄位 👇👇👇
+        z_layout_spacer: fields.text({
+          label: '--------- ⬇️ 頁面底部墊高區 (請忽略) ⬇️ ---------',
+          description: '此欄位僅用於解決無法捲動到底部的問題，請勿填寫。',
+          multiline: true, // 開啟多行模式，讓它佔據更多高度
+        }),
+        
       },
     }),
     schedule: singleton({
@@ -60,7 +100,17 @@ export default config({
       path: 'src/content/blog/*',// 每個文章一個資料夾 (包含圖片)
       format: { contentField: 'content' },
       schema: {
-        title: fields.slug({ name: { label: '標題' } }),
+        title: fields.slug({ 
+          name: { 
+            label: '文章標題 (Title)', 
+            description: '顯示在網站上的大標題'
+          },
+          slug: {
+            label: '網址代稱 (Slug)',
+            description: '網址的最後一部分 (建議使用英文，例如: prostate-treatment)，這會影響 SEO 且發布後不建議修改。'
+          }
+        }),
+        
         date: fields.date({ label: '發布日期' }),      
         author: fields.text({ 
             label: '作者',
@@ -75,7 +125,19 @@ export default config({
         coverImage: fields.image({
             label: '文章封面圖',
             directory: 'src/content/blog', // 放在文章同級目錄，便於 Astro Image 優化
-            publicPath: './'
+            publicPath: './',
+            description: '上傳需要一點時間。封面圖片，建議 1200x628 像素，比例約 1.91:1，有助於社群分享時顯示效果。',
+        }),
+
+        content: fields.document({
+          label: '文章內文',
+          formatting: true,
+          dividers: true,
+          links: true,
+          images: {
+            directory: 'src/content/blog',
+            publicPath: './',
+          },
         }),
 
         // SEO 設定：給 Google 看
@@ -95,16 +157,15 @@ export default config({
             description: '顯示於首頁卡片，若留空，程式端可設定回退使用 SEO 描述。'
         }),
 
-        content: fields.document({
-          label: '內文',
-          formatting: true,
-          dividers: true,
-          links: true,
-          images: {
-            directory: 'src/content/blog',
-            publicPath: './',
-          },
+        // 👇👇👇 新增這個墊高用欄位 👇👇👇
+        z_layout_spacer: fields.text({
+          label: '--------- ⬇️ 頁面底部墊高區 (請忽略) ⬇️ ---------',
+          description: '此欄位僅用於解決無法捲動到底部的問題，請勿填寫。',
+          multiline: true, // 開啟多行模式，讓它佔據更多高度
         }),
+
+
+        
       },
     }),
   },

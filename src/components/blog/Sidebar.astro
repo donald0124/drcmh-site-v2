@@ -1,39 +1,61 @@
 ---
+// src/components/blog/Sidebar.astro
 import { Calendar, MapPin, ArrowRight } from 'lucide-react';
+import { Image } from 'astro:assets';
+import { getEntry } from 'astro:content';
 
-// 模擬醫師資料 (也可從 Keystatic Singleton 讀取)
-const doctor = {
-  name: "周孟翰",
-  title: "院長",
-  clinic: "新店高美泌尿科診所",
-  image: "/images/doctor-avatar-placeholder.png", // 建議準備一張方形大頭照
-  intro: "致力於透過細膩的溝通與精準的治療，協助您卸下心理負擔，重拾自信生活。"
-};
+// 1. 讀取 Keystatic Singleton 資料
+const settingsEntry = await getEntry('settings', 'global');
+// 🟢 新增這段防呆檢查
+if (!settingsEntry) {
+  // 如果找不到設定檔，為了不讓網頁掛掉，我們可以選擇拋出錯誤提示開發者
+  throw new Error('無法讀取全站設定 (src/content/settings/global.yaml)。請確認 Keystatic 後台是否已儲存過「全站資訊」。');
+}
+const settings = settingsEntry.data;
+
+// 2. 處理預設圖片 (防呆機制：如果學長沒上傳照片，給一張預設圖)
+// 這裡可以先 import 一張本地的預設圖，以防萬一
+import defaultAvatar from '../../assets/drchou-profile-2.png' 
 ---
+
 
 <aside class="space-y-8 sticky top-24">
   
   {/* 1. 醫師簡介卡片 */}
   <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm text-center">
-    <div class="w-24 h-24 mx-auto rounded-full bg-highlight overflow-hidden mb-4 border-4 border-white shadow-md">
-      {/* 這裡之後換成真實大頭照 */}
-      <div class="w-full h-full flex items-center justify-center text-accent text-2xl font-bold bg-bg">
-         周
-      </div>
-      {/* <img src={doctor.image} alt={doctor.name} class="w-full h-full object-cover" /> */}
+    <div class="w-24 h-24 mx-auto rounded-full bg-highlight overflow-hidden mb-4 border-4 border-white shadow-md relative group">
+      {settings.avatar ? (
+        <Image 
+          src={settings.avatar}
+          alt={`${settings.doctorName}醫師`} 
+          class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-110"
+          width={200} 
+          height={200}
+        />
+      ) : (
+        /* 如果沒上傳圖片顯示的佔位符 */
+        <div class="w-full h-full flex items-center justify-center text-accent text-2xl font-bold bg-bg">
+           {settings.doctorName[0]}
+        </div>
+      )}
     </div>
     
+{/* 姓名與職稱 */}
     <h3 class="text-xl font-serif font-bold text-primary mb-1">
-      {doctor.name} <span class="text-sm font-sans font-normal text-text">{doctor.title}</span>
+      {settings.doctorName} <span class="text-sm font-sans font-normal text-text">{settings.doctorTitle}</span>
     </h3>
+    
+    {/* 診所名稱 */}
     <p class="text-xs font-bold text-accent tracking-wider uppercase mb-4">
-      {doctor.clinic}
+      {settings.clinicName}
     </p>
     
+    {/* 側邊欄簡介 */}
     <p class="text-sm text-text/80 leading-relaxed mb-6 text-justify">
-      {doctor.intro}
+      {settings.sidebarIntro}
     </p>
-
+    
+    {/* 連結到關於我的按鈕 */}
     <a 
       href="/#about" 
       class="text-sm font-bold text-primary hover:text-accent transition-colors flex items-center justify-center gap-1 group"
@@ -47,7 +69,7 @@ const doctor = {
     {/* 裝飾背景 */}
     <div class="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full blur-xl -translate-y-1/2 translate-x-1/2"></div>
     
-    <h3 class="text-lg font-bold mb-2 relative z-10">受夠了頻尿困擾？</h3>
+    <h3 class="text-lg  text-white font-bold mb-2 relative z-10">受夠了頻尿困擾？</h3>
     <p class="text-sm text-gray-300 mb-6 relative z-10">
       別讓症狀影響生活品質，立即預約諮詢。
     </p>
