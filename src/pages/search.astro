@@ -1,0 +1,52 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="全站搜尋 | Dr. Chou 泌尿科診所">
+  <div class="min-h-screen bg-white pt-24 pb-16">
+    <div class="container mx-auto px-4 max-w-2xl">
+      
+      <h1 class="text-2xl font-serif font-bold text-primary mb-6 text-center">
+        搜尋全站文章
+      </h1>
+
+      <div id="search-page" class="w-full min-h-[50vh]"></div>
+
+    </div>
+  </div>
+
+  <script is:inline>
+    // 👇 修正：改用 'astro:page-load' 支援 View Transitions
+    document.addEventListener('astro:page-load', () => {
+        // 先檢查 #search-page 是否存在 (避免在別頁報錯)
+        const searchDiv = document.querySelector("#search-page");
+        
+        if (searchDiv) {
+            // 清空內容，避免重複初始化導致出現兩個搜尋框
+            searchDiv.innerHTML = '';
+            
+            new PagefindUI({
+                element: "#search-page",
+                showSubResults: true,
+                showImages: false,
+                resetStyles: false,
+                autofocus: true, 
+                translations: { placeholder: "  請輸入關鍵字搜尋..." }
+            });
+        }
+    });
+  </script>
+
+  <style is:global>
+    /* 針對搜尋頁面的特別樣式優化 */
+    #search-page .pagefind-ui__search-input {
+      @apply w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-lg !important;
+    }
+    #search-page .pagefind-ui__search-input:focus {
+      @apply border-primary bg-white outline-none !important;
+    }
+    #search-page .pagefind-ui__drawer {
+      @apply shadow-none border-none !important; /* 移除邊框，因為已經在頁面裡了 */
+    }
+  </style>
+</Layout>

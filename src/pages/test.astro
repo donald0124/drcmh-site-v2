@@ -1,0 +1,35 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="影片嵌入測試">
+  <div class="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-10">
+    <h1 class="text-2xl font-bold mb-6">單一影片嵌入測試</h1>
+    
+    <div class="w-full max-w-2xl bg-white p-4 rounded-xl shadow-lg">
+      <div class="aspect-video relative">
+        <iframe 
+          width="100%" 
+          height="100%" 
+          src="https://youtu.be/RSbH0PnGA6o?si=eFBwrGQi9sTKxn-H" 
+          title="YouTube video player" 
+          frameborder="0" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+          allowfullscreen
+          class="absolute inset-0 w-full h-full rounded-lg"
+        ></iframe>
+      </div>
+    </div>
+
+    <div class="mt-8 text-gray-600">
+      <p>如果這裡顯示「<strong>影片無法播放</strong>」或「<strong>錯誤 153</strong>」：</p>
+      <ul class="list-disc list-inside mt-2 text-red-600 font-bold">
+        <li>代表這支影片在 YouTube 後台被設定為「禁止嵌入」。</li>
+        <li>請去 YouTube 工作室開啟權限。</li>
+      </ul>
+      <p class="mt-4 text-green-600 font-bold">
+        如果這裡可以正常播放，代表影片沒問題，是我們之前的 JavaScript 程式碼寫錯了。
+      </p>
+    </div>
+  </div>
+</Layout>

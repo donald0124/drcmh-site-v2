@@ -12,12 +12,12 @@ const menuItems = [
 ];
 ---
 
-    <!-- Pagefind 從Header搬來 再搬回來 -->
-    <link href="/pagefind/pagefind-ui.css" rel="stylesheet">
-    <script src="/pagefind/pagefind-ui.js" is:inline async></script>
+<!-- Pagefind 從Header搬來 再搬回來 -->
+<link href="/pagefind/pagefind-ui.css" rel="stylesheet">
+<script src="/pagefind/pagefind-ui.js" is:inline async></script>
 
 
-<header class="fixed top-0 w-full z-40 bg-bg/85 backdrop-blur-md border-b border-white/20 shadow-sm transition-all duration-300" data-pagefind-ignore>
+<header class="sticky top-0 w-full z-40 bg-white/95 backdrop-blur-md border-b border-white/20 shadow-sm transition-all duration-300" data-pagefind-ignore>
   <div class="container mx-auto px-4 md:px-6 h-20 flex justify-between items-center relative">
     
     {/* 1. Logo 區域 */}
@@ -63,8 +63,13 @@ const menuItems = [
     {/* 3. 手機版/平板版 (Mobile/Tablet) */}
     <div class="flex items-center gap-2 lg:hidden">
       {/* 搜尋 widget (手機版會顯示放大鏡) */}
-      <SearchWidget client:idle />
-      
+      <a 
+        href="/search" 
+        class="p-2 text-text hover:bg-gray-100 rounded-full transition-colors"
+        aria-label="搜尋"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      </a>
       {/* 漢堡選單 */}
       <MobileMenu client:media="(max-width: 1024px)" menuItems={menuItems} />
     </div>
@@ -124,15 +129,6 @@ const menuItems = [
     padding: 0;
   }
 
-  /* === 手機版樣式修正 (#mobile-search) === */
-  #mobile-search .pagefind-ui__search-input {
-    @apply border border-gray-300 text-base rounded-xl w-full bg-surface !important;
-    padding: 1rem 1rem 1rem 3rem !important;
-  }
-
-  #mobile-search .pagefind-ui__drawer {
-    @apply border-t border-gray-100 mt-4;
-  }
 
   /* === 結果列表通用優化 === */
   .pagefind-ui__result {
