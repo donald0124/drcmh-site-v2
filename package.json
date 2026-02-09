@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && npx pagefind --site dist",
+    "build": "astro build && npx pagefind --site dist --force-language zh-TW",
     "preview": "npx wrangler pages dev dist",
     "astro": "astro"
   },

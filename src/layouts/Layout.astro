@@ -52,6 +52,9 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
+
+
+
     <!-- Astro View Transitions (讓換頁更順暢，可選) -->
     <ViewTransitions />
   </head>
@@ -59,10 +62,10 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     
 	<Header slot="header" />
 
-	<main class="flex-grow">
-		<slot />
-	</main>
-	
+  <main class="flex-grow" data-pagefind-body>
+      <slot />
+  </main>
+
 	<Footer slot="footer" />
     
   </body>

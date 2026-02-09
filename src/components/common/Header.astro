@@ -12,10 +12,12 @@ const menuItems = [
 ];
 ---
 
-<link href="/pagefind/pagefind-ui.css" rel="stylesheet">
-<script src="/pagefind/pagefind-ui.js" is:inline></script>
+    <!-- Pagefind 從Header搬來 再搬回來 -->
+    <link href="/pagefind/pagefind-ui.css" rel="stylesheet">
+    <script src="/pagefind/pagefind-ui.js" is:inline async></script>
 
-<header class="fixed top-0 w-full z-40 bg-bg/85 backdrop-blur-md border-b border-white/20 shadow-sm transition-all duration-300">
+
+<header class="fixed top-0 w-full z-40 bg-bg/85 backdrop-blur-md border-b border-white/20 shadow-sm transition-all duration-300" data-pagefind-ignore>
   <div class="container mx-auto px-4 md:px-6 h-20 flex justify-between items-center relative">
     
     {/* 1. Logo 區域 */}
