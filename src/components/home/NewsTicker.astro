@@ -1,0 +1,84 @@
+---
+import { getCollection } from 'astro:content';
+import { Megaphone } from 'lucide-react';
+
+// 1. 抓取所有最新消息
+const allNews = await getCollection('news');
+
+// 2. 篩選置頂 (isPinned) 且排序 (日期新到舊)
+const pinnedNews = allNews
+  .filter(post => post.data.isPinned)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+// 如果沒有置頂消息，不顯示此元件
+if (pinnedNews.length === 0) {
+  return null;
+}
+
+// 判斷是否需要跑馬燈 (超過 1 則)
+const isMarquee = pinnedNews.length > 1;
+---
+
+<div class="bg-primary text-white text-sm relative z-50 overflow-hidden border-b border-white/10">
+  <div class="container mx-auto px-4 h-10 flex items-center">
+    
+    {/* 左側圖示區 (固定不動) */}
+    <div class="flex items-center gap-2 pr-4 bg-primary z-10 shrink-0 h-full shadow-[5px_0_10px_rgba(23,42,69,0.5)]">
+       <Megaphone size={16} className="text-secondary animate-pulse" />
+       <span class="font-bold tracking-wider text-xs uppercase text-secondary/80 hidden sm:block">LATEST NEWS</span>
+    </div>
+
+    {/* 右側內容區 */}
+    <div class="flex-1 overflow-hidden relative h-full flex items-center mask-image-gradient">
+      
+      {/* 
+         跑馬燈容器 
+         - group: 用於控制 hover 暫停
+         - animate-marquee: 只有在 isMarquee 為 true 時才加入動畫
+      */}
+      <div class={`
+        flex items-center gap-8 whitespace-nowrap group
+        ${isMarquee ? 'animate-marquee hover:pause-animation w-max' : 'w-full'}
+      `}>
+        
+        {/* 如果是跑馬燈，為了無縫循環，需要重複渲染一次清單 (A + A) */}
+        {(isMarquee ? [...pinnedNews, ...pinnedNews] : pinnedNews).map((post) => (
+           <a 
+             href={`/news/${post.id}`} 
+             class="flex items-center gap-2 hover:text-secondary transition-colors duration-300 py-1"
+           >
+             <span class="inline-block w-1.5 h-1.5 rounded-full bg-secondary"></span>
+             <span>{post.data.title}</span>
+             {post.data.category === 'closed' && (
+                <span class="text-[10px] bg-red-500/20 text-red-200 px-1.5 py-0.5 rounded border border-red-500/30">停診</span>
+             )}
+           </a>
+        ))}
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  /* 跑馬燈動畫 */
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .animate-marquee {
+    animation: marquee 30s linear infinite;
+  }
+
+  /* 滑鼠懸停時暫停動畫 */
+  .hover\:pause-animation:hover {
+    animation-play-state: paused;
+  }
+
+  /* 兩側漸層遮罩 (讓文字淡出淡入) */
+  .mask-image-gradient {
+    mask-image: linear-gradient(to right, transparent, black 20px, black 95%, transparent);
+  }
+</style>

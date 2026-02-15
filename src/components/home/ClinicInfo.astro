@@ -1,28 +1,60 @@
 ---
+import { getEntry } from 'astro:content';
 import { MapPin, Phone, Mail, Clock, Calendar, ExternalLink } from 'lucide-react';
 
-// 診所資訊 (未來可從 Keystatic 全域設定讀取)
+// 🟢 從 Keystatic 讀取全域設定
+const settings = await getEntry('settings', 'global');
+const { doctorName, doctorTitle, clinicName, address, phone, email, bookingLink, googleMapEmbedLink } = settings.data;
+
+// 🟢 從 Keystatic 讀取門診表設定
+const scheduleData = await getEntry('schedule', 'timetable');
+
 const clinicData = {
-  name: "新店高美泌尿科診所",
+  name: clinicName || "新店高美泌尿科診所",
   doctor: "周孟翰",
-  title: "院長",
-  address: "新北市新店區二十張路5號1樓",
-  phone: "02-2915-XXXX (建置中)", // 暫時 Placeholder
-  email: "d10822201@gmail.com",
-  mapLink: "https://www.google.com/maps/search/?api=1&query=新北市新店區二十張路5號1樓",
-  bookingLink: "#", // 待補上正式掛號連結
+  title: doctorTitle || "院長",
+  address: address || "新北市新店區二十張路5號1樓",
+  phone: phone || "(診所電話建置中)", 
+  email: email || "d10822201@gmail.com",
+  mapLink: googleMapEmbedLink || "https://www.google.com/maps/search/?api=1&query=新北市新店區二十張路5號1樓",
+  bookingLink: bookingLink || "#",
 };
 
-// 門診表模擬資料 (true: 看診, false: 休診)
-// 實際上線前需確認正確診次
-const schedule = [
-  { day: "週一", morning: true, afternoon: true, evening: true },
-  { day: "週二", morning: false, afternoon: true, evening: true },
-  { day: "週三", morning: true, afternoon: false, evening: true },
-  { day: "週四", morning: false, afternoon: true, evening: true },
-  { day: "週五", morning: true, afternoon: true, evening: false },
-  { day: "週六", morning: true, afternoon: false, evening: false },
+// 門診表設定
+const weeklySchedule = scheduleData?.data?.weeklySchedule || [];
+
+// 假如還沒有設定，給預設值 (確保畫面不空)
+const defaultSchedule = [
+  { day: "週一", morning: { status: "看診" }, afternoon: { status: "看診" }, evening: { status: "看診" } },
+  { day: "週二", morning: { status: "休診" }, afternoon: { status: "看診" }, evening: { status: "看診" } },
+  { day: "週三", morning: { status: "看診" }, afternoon: { status: "休診" }, evening: { status: "看診" } },
+  { day: "週四", morning: { status: "休診" }, afternoon: { status: "看診" }, evening: { status: "看診" } },
+  { day: "週五", morning: { status: "看診" }, afternoon: { status: "看診" }, evening: { status: "休診" } },
+  { day: "週六", morning: { status: "看診" }, afternoon: { status: "休診" }, evening: { status: "休診" } },
 ];
+
+const displaySchedule = weeklySchedule.length > 0 ? weeklySchedule : defaultSchedule;
+
+// 輔助函式：取得顯示文字
+const getStatusLabel = (slot) => {
+  if (!slot) return '-';
+  if (slot.status === '自訂') return slot.customLabel || '-';
+  if (slot.status === '看診') return '●';
+  if (slot.status === '休診') return '-';
+  if (slot.status === '特約診') return '約';
+  if (slot.status === '手術日') return '術';
+  return slot.status; // 若有未預期的狀態，直接顯示
+};
+
+// 輔助函式：取得樣式
+const getStatusClass = (status) => {
+   if (status === '看診') return 'text-accent font-bold bg-accent/10';
+   if (status === '休診') return 'text-text/20';
+   if (status === '特約診') return 'text-orange-500 font-bold bg-orange-100';
+   if (status === '手術日') return 'text-blue-500 font-bold bg-blue-100';
+   if (status === '自訂') return 'text-primary font-bold bg-gray-100';
+   return 'text-text/20';
+};
 ---
 
 <section id="clinic" class="py-24 bg-bg relative overflow-hidden">
@@ -143,14 +175,14 @@ const schedule = [
               <div class="text-text/40 font-bold text-sm flex items-center justify-center">
                 <Calendar size={16} />
               </div>
-              <div class="text-primary font-bold text-sm bg-highlight/50 py-2 rounded-lg">早</div>
-              <div class="text-primary font-bold text-sm bg-highlight/50 py-2 rounded-lg">午</div>
-              <div class="text-primary font-bold text-sm bg-highlight/50 py-2 rounded-lg">晚</div>
+              <div class="text-primary font-bold text-sm bg-highlight/50 py-2 rounded-lg">早 (0900-1130)</div>
+              <div class="text-primary font-bold text-sm bg-highlight/50 py-2 rounded-lg">午 (1430-1700)</div>
+              <div class="text-primary font-bold text-sm bg-highlight/50 py-2 rounded-lg">晚 (1800-2100)</div>
            </div>
            
            {/* 表格內容 */}
            <div class="space-y-3">
-              {schedule.map((s) => (
+              {displaySchedule.map((s) => (
                  <div class="grid grid-cols-4 gap-4 items-center text-center group hover:bg-bg/50 rounded-xl transition-colors py-2 px-1">
                     {/* 星期 */}
                     <div class="font-bold text-primary text-sm group-hover:text-accent transition-colors">
@@ -158,30 +190,21 @@ const schedule = [
                     </div>
                     
                     {/* 早診 */}
-                    <div class={`text-sm py-2 rounded-lg flex justify-center items-center transition-all ${
-                      s.morning 
-                        ? 'text-accent font-bold bg-accent/10' 
-                        : 'text-text/20'
-                    }`}>
-                       {s.morning ? '●' : '-'}
+                    <div class={`text-sm py-2 rounded-lg flex flex-col justify-center items-center transition-all ${getStatusClass(s.morning?.status)}`}>
+                       <span>{getStatusLabel(s.morning)}</span>
+                       {s.morning?.note && <span class="text-[0.6rem] opacity-70 mt-0.5 font-normal">{s.morning.note}</span>}
                     </div>
                     
                     {/* 午診 */}
-                    <div class={`text-sm py-2 rounded-lg flex justify-center items-center transition-all ${
-                      s.afternoon 
-                        ? 'text-accent font-bold bg-accent/10' 
-                        : 'text-text/20'
-                    }`}>
-                       {s.afternoon ? '●' : '-'}
+                    <div class={`text-sm py-2 rounded-lg flex flex-col justify-center items-center transition-all ${getStatusClass(s.afternoon?.status)}`}>
+                       <span>{getStatusLabel(s.afternoon)}</span>
+                       {s.afternoon?.note && <span class="text-[0.6rem] opacity-70 mt-0.5 font-normal">{s.afternoon.note}</span>}
                     </div>
                     
                     {/* 晚診 */}
-                    <div class={`text-sm py-2 rounded-lg flex justify-center items-center transition-all ${
-                      s.evening 
-                        ? 'text-accent font-bold bg-accent/10' 
-                        : 'text-text/20'
-                    }`}>
-                       {s.evening ? '●' : '-'}
+                    <div class={`text-sm py-2 rounded-lg flex flex-col justify-center items-center transition-all ${getStatusClass(s.evening?.status)}`}>
+                       <span>{getStatusLabel(s.evening)}</span>
+                       {s.evening?.note && <span class="text-[0.6rem] opacity-70 mt-0.5 font-normal">{s.evening.note}</span>}
                     </div>
                  </div>
               ))}

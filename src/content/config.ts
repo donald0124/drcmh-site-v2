@@ -14,7 +14,7 @@ const blog = defineCollection({
       return str.split(',').map((s) => s.trim()).filter(Boolean);
     }),
     coverImage: image().optional(),
-    
+
     // 🟢 對應 Keystatic 的 Conditional 欄位 (advanced)
     advanced: z.union([
       // 情況 A: 有勾選 (true)
@@ -46,7 +46,7 @@ const news = defineCollection({
     isPinned: z.boolean().default(false),
     category: z.enum(['announcement', 'closed', 'activity']).default('announcement'),
     coverImage: image().optional(),
-    
+
     // 墊高欄位
     z_layout_spacer: z.string().optional(),
   }),
@@ -84,10 +84,11 @@ const settings = defineCollection({
     doctorWord: z.string().optional(), // [NEW]
     sidebarIntro: z.string().optional(),
     phone: z.string().optional(),
+    email: z.string().optional(),
     address: z.string().optional(),
     bookingLink: z.string().url().optional(),
     googleMapEmbedLink: z.string().url().optional(), // [NEW]
-    
+
     // 墊高欄位
     z_layout_spacer: z.string().optional(),
   }),
@@ -100,16 +101,50 @@ const schedule = defineCollection({
     image: image().optional(),
     lastUpdated: z.date().optional(), // 或是 z.string()
     note: z.string().optional(),
-    
+
+    // 🟢 每週門診表設定
+    weeklySchedule: z.array(
+      z.object({
+        day: z.string(),
+        morning: z.object({
+          status: z.string(),
+          customLabel: z.string().optional(),
+          note: z.string().optional(),
+        }),
+        afternoon: z.object({
+          status: z.string(),
+          customLabel: z.string().optional(),
+          note: z.string().optional(),
+        }),
+        evening: z.object({
+          status: z.string(),
+          customLabel: z.string().optional(),
+          note: z.string().optional(),
+        }),
+      })
+    ).optional(),
+
     // 墊高欄位
     z_layout_spacer: z.string().optional(),
   }),
 });
 
-export const collections = { 
-    'blog': blog,
-    'news': news,
-    'videos': videos,
-    'settings': settings,
-    'schedule': schedule
+// 6. 專業履歷 (Resume)
+const resume = defineCollection({
+  loader: glob({ pattern: "resume.yaml", base: "./src/content/settings" }),
+  schema: ({ image }) => z.object({
+    experiences: z.array(z.string()).optional(),
+    associations: z.array(z.string()).optional(),
+    educations: z.array(z.string()).optional(),
+    certifications: z.array(z.string()).optional(),
+  }),
+});
+
+export const collections = {
+  'blog': blog,
+  'news': news,
+  'videos': videos,
+  'settings': settings,
+  'schedule': schedule,
+  'resume': resume
 };

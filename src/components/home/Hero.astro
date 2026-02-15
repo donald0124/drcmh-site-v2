@@ -1,20 +1,21 @@
 ---
 import { ArrowRight, Activity, Award } from 'lucide-react';
 import { Image } from 'astro:assets';
+import { getEntry } from 'astro:content';
 import doctorProfile from '../../assets/drchou-profile-2.png';
 
-// 暫時使用 Placeholder 圖片，實際上線時請替換為真實的醫師去背 PNG
-// 請確保有一張 src/assets/doctor-hero.png (或 jpg)
-const doctorImage = "/images/doctor-placeholder.png"; // 假設放在 public/images/
+// 🟢 從 Keystatic 讀取全域設定
+const settings = await getEntry('settings', 'global');
+const { doctorName, doctorTitle, clinicName, slogan, heroIntro } = settings.data;
 
-// 文案資料 (源自 PRD v3.1)
+// 文案資料
 const content = {
   tag: "Dr. Chou Meng-Han",
   name: "周孟翰",
   title: "醫師",
-  subTitle: "新店高美泌尿科診所 院長",
-  slogan: "讓難以啟齒的煩惱，變成輕鬆自在的日常",
-  intro: "在診間，沒有尷尬的提問，只有專業的傾聽。我們致力於透過細膩的溝通與精準的治療，協助您卸下心理負擔，重拾自信與舒適的生活步調。",
+  subTitle: `${clinicName} ${doctorTitle}`,
+  slogan: slogan || "讓難以啟齒的煩惱，變成輕鬆自在的日常",
+  intro: heroIntro || "在診間，沒有尷尬的提問，只有專業的傾聽。我們致力於透過細膩的溝通與精準的治療，協助您卸下心理負擔，重拾自信與舒適的生活步調。",
 };
 ---
 

@@ -1,36 +1,19 @@
 ---
+import { getEntry } from 'astro:content';
 import { GraduationCap, Award, Stethoscope, Building2, CheckCircle2 } from 'lucide-react';
 
-// 資料來源：個人單頁履歷_周孟翰_20260111_更新版.pptx
-const experiences = [
-  "三軍總醫院外科住院醫師、部總醫師",
-  "三軍總醫院泌尿科住院醫師、總醫師",
-  "國軍花蓮總醫院泌尿科主治醫師",
-  "三軍總醫院急診部主治醫師",
-  "台北榮民總醫院桃園分院泌尿科兼任主治醫師",
-  "台北門診中心泌尿科主治醫師",
-  "三軍總醫院泌尿科主治醫師",
-  "教育部部定講師",
-  "國防醫學大學外科學科專任講師",
-];
+// 🟢 從 Keystatic 讀取全域設定
+const settings = await getEntry('settings', 'global');
+const { doctorWord, doctorName } = settings.data;
 
-const associations = [
-  "台灣泌尿科醫學會(TUA)會員",
-  "台灣男性學暨性醫學醫學會(TAASM)會員",
-  "台灣尿失禁防治協會(TCS)會員"
-];
-
-const educations = [
-  "國防醫學院醫學系學士",
-  "台灣科技大學應用科技研究所博士候選人"
-];
-
-const certifications = [
-  "台灣外科醫學會專科醫師",
-  "台灣泌尿科醫學會專科醫師",
-  "台灣泌尿科達文西機械手臂手術專科醫師",
-  "性傳染病友善門診專家醫師"
-];
+// 🟢 從 Keystatic 讀取專業履歷
+const resume = await getEntry('resume', 'resume');
+const { 
+  experiences = [], 
+  associations = [], 
+  educations = [], 
+  certifications = [] 
+} = resume?.data || {};
 ---
 
 <section id="about" class="py-24 bg-surface relative">
@@ -135,7 +118,7 @@ const certifications = [
         {/* 醫師的話 (引用) */}
         <div class="pt-8 border-t border-highlight">
            <blockquote class="text-text italic leading-relaxed text-sm">
-             「醫師的話醫師的話醫師的話醫師醫師的話醫師的話醫師的話醫師的話醫師的話醫師的話。」 
+             「{doctorWord || "致力於透過細膩的溝通與精準的治療，協助您卸下心理負擔，重拾自信生活。"}」 
            </blockquote>
            <div class="mt-4 flex items-center gap-3">
               <div class="w-8 h-0.5 bg-accent"></div>

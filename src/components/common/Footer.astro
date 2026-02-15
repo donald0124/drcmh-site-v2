@@ -1,15 +1,18 @@
 ---
+import { getEntry } from 'astro:content';
 import { MapPin, Phone, Mail, ArrowUp } from 'lucide-react';
 
 const currentYear = new Date().getFullYear();
 
-// 這裡未來可以改用 getEntry 從 Keystatic 讀取全域設定
-// 目前先暫時 hardcode 確保開發順利
+// 🟢 改用 getEntry 從 Keystatic 讀取全域設定
+const settings = await getEntry('settings', 'global');
+const { doctorName, clinicName, address, phone, sidebarIntro, email } = settings.data;
+
 const clinicInfo = {
-  name: "新店高美泌尿科診所",
-  address: "新北市新店區二十張路5號1樓",
-  email: "d10822201@gmail.com",
-  phone: "(診所電話建置中)"
+  name: clinicName || "新店高美泌尿科診所",
+  address: address || "新北市新店區二十張路5號1樓",
+  email: email || "d10822201@gmail.com",
+  phone: phone || "(診所電話建置中)"
 };
 ---
 
@@ -29,8 +32,7 @@ const clinicInfo = {
           <span class="text-xs text-accent tracking-[0.2em] uppercase font-semibold">Urology Clinic</span>
         </div>
         <p class="text-white/90 text-sm leading-relaxed max-w-sm">
-          周孟翰醫師致力於提供隱私、專業且溫暖的泌尿科診療服務。
-          我們相信，好的治療始於良好的醫病溝通。
+          {sidebarIntro}
         </p>
       </div>
 
@@ -38,9 +40,11 @@ const clinicInfo = {
       <div>
         <h4 class="font-bold text-accent mb-6 text-sm tracking-wider">QUICK LINKS</h4>
         <ul class="space-y-3 text-sm text-white/90">
+          <li><a href="/news" class="hover:text-white hover:translate-x-1 transition-all inline-block">最新消息</a></li>
           <li><a href="/#about" class="hover:text-white hover:translate-x-1 transition-all inline-block">關於醫師</a></li>
           <li><a href="/#expertise" class="hover:text-white hover:translate-x-1 transition-all inline-block">主治專長</a></li>
           <li><a href="/blog" class="hover:text-white hover:translate-x-1 transition-all inline-block">衛教專欄</a></li>
+          <li><a href="/video" class="hover:text-white hover:translate-x-1 transition-all inline-block">影音專區</a></li>
           <li><a href="/#clinic" class="hover:text-white hover:translate-x-1 transition-all inline-block">門診資訊</a></li>
         </ul>
       </div>
@@ -89,8 +93,7 @@ const clinicInfo = {
       </p>
       
       <div class="flex gap-6">
-        <a href="/privacy" class="hover:text-white transition-colors">隱私權政策</a>
-        <a href="/privacy" class="hover:text-white transition-colors">服務條款</a>
+        <a href="/privacy" class="hover:text-white transition-colors">隱私權政策與免責聲明</a>
       </div>
       <div>
         <a href="#top" class="inline-flex items-center gap-1 text-white/80 hover:text-white transition-colors">
