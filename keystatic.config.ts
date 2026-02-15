@@ -17,8 +17,8 @@ export default config({
   ui: {
     brand: { name: '周孟翰醫師後台' },
     navigation: {
-      '網站內容': ['blog', 'news', 'videos', 'schedule'],
-      '全站設定': ['settings', 'resume'],
+      '網站內容': ['news', 'blog', 'videos', 'shorts'],
+      '全站設定': ['schedule', 'resume', 'settings'],
     }
   },
 
@@ -57,7 +57,7 @@ export default config({
           label: '醫師的話 (Doctor\'s Word)',
           multiline: true,
           description: '顯示於首頁的醫師短語或理念闡述。',
-          defaultValue: '致力於透過細膩的溝通與精準的治療，協助您卸下心理負擔，重拾自信生活。'
+          defaultValue: '許多人遲疑地走進泌尿科，是因為不好意思、擔心，或不確定這樣的問題是否需要就醫。多年在醫學中心與臨床第一線的訓練與看診經驗，讓我深刻體會到，泌尿科的困擾不只是身體的不適，更常影響一個人的自信、尊嚴與生活品質。因此，我重視傾聽與清楚說明，陪您一起找出真正適合您的治療方式。希望這裡不只是一間看病的診所，而是一個能讓您安心談論任何難以啟齒問題的地方。我會以專業為基礎、以理解為出發點，陪您一起守護下半身的健康與長遠的生活品質。'
         }),
 
         sidebarIntro: fields.text({
@@ -75,12 +75,6 @@ export default config({
         googleMapEmbedLink: fields.url({ label: 'Google 地圖嵌入連結' }),
 
 
-        // 👇👇👇 新增這個墊高用欄位 👇👇👇
-        z_layout_spacer: fields.text({
-          label: '--------- ⬇️ 頁面底部墊高區 (請忽略) ⬇️ ---------',
-          description: '此欄位僅用於解決無法捲動到底部的問題，請勿填寫。',
-          multiline: true, // 開啟多行模式，讓它佔據更多高度
-        }),
 
       },
     }),
@@ -189,13 +183,49 @@ export default config({
           }
         ),
 
-        // 👇👇👇 墊高用欄位 👇👇👇
-        z_layout_spacer: fields.text({
-          label: '--------- ⬇️ 頁面底部墊高區 (請忽略) ⬇️ ---------',
-          description: '此欄位僅用於解決無法捲動到底部的問題，請勿填寫。',
-          multiline: true,
-        }),
 
+      },
+    }),
+
+    faq: singleton({
+      label: '常見問答集 (FAQ)',
+      path: 'src/content/faq/list',
+      schema: {
+        title: fields.text({ label: '區塊標題', defaultValue: '常見問答' }),
+        subtitle: fields.text({ label: '區塊副標題', defaultValue: '解除您的疑惑，安心看診' }),
+        items: fields.array(
+          fields.object({
+            question: fields.text({ label: '問題 (Question)' }),
+            answer: fields.text({ label: '回答 (Answer)', multiline: true }),
+          }),
+          {
+            label: '問答列表 (QA List)',
+            itemLabel: props => props.fields.question.value || '新增問答',
+          }
+        ),
+      },
+    }),
+
+    // --- 4. 短影音 (直式) ---
+    shorts: singleton({
+      label: '短影音管理 (Shorts)',
+      path: 'src/content/shorts/index',
+      schema: {
+        list: fields.array(
+          fields.object({
+            title: fields.text({ label: '短影音標題' }),
+            youtubeUrl: fields.url({
+              label: 'Shorts 連結 (URL)',
+              description: '請貼上 Shorts 完整網址 (例如: https://www.youtube.com/shorts/Pd_nQh8qg)',
+              validation: { isRequired: true }
+            }),
+            date: fields.date({ label: '發布日期', defaultValue: { kind: 'today' } }),
+          }),
+          {
+            label: '短影音列表',
+            itemLabel: props => props.fields.title.value || '新增短影音',
+          }
+        ),
       },
     }),
   },
@@ -204,7 +234,8 @@ export default config({
     blog: collection({
       label: '衛教文章管理',
       slugField: 'title',
-      path: 'src/content/blog/*',// 每個文章一個資料夾 (包含圖片)
+      // 👇 關鍵在這裡：使用 ** (代表存成資料夾結構)
+      path: 'src/content/blog/**/index',
       format: { contentField: 'content' },
       columns: ['title', 'date'],
       // 🟢 新增這一行：預覽網址設定
@@ -241,6 +272,7 @@ export default config({
           dividers: true,
           links: true,
           images: {
+            // 👇 圖片存到當前目錄 (./)
             directory: 'src/content/blog',
             publicPath: './',
           },
@@ -257,9 +289,8 @@ export default config({
             // 2. 當勾選 (true) 時顯示的欄位
             true: fields.object({
               excerpt: fields.text({
-                label: '列表摘要',
-                multiline: true,
-                description: '顯示於首頁卡片。'
+                label: '預覽文字',
+                description: '會顯示於文章預覽卡片上。'
               }),
               seoTitle: fields.text({
                 label: 'SEO 標題',
@@ -275,12 +306,6 @@ export default config({
           }
         ),
 
-        // 👇👇👇 新增這個墊高用欄位 👇👇👇
-        z_layout_spacer: fields.text({
-          label: '--------- ⬇️ 頁面底部墊高區 (請忽略) ⬇️ ---------',
-          description: '此欄位僅用於解決無法捲動到底部的問題，請勿填寫。',
-          multiline: true, // 開啟多行模式，讓它佔據更多高度
-        }),
       },
     }),
 
@@ -325,36 +350,22 @@ export default config({
           images: { directory: 'src/content/news', publicPath: './' },
         }),
 
-        // 👇👇👇 墊高用欄位 👇👇👇
-        z_layout_spacer: fields.text({
-          label: '--------- ⬇️ 頁面底部墊高區 (請忽略) ⬇️ ---------',
-          description: '此欄位僅用於解決無法捲動到底部的問題，請勿填寫。',
-          multiline: true,
-        }),
       },
     }),
 
     // --- 3. 影音專區 (Videos) ---
+    // --- 3. 衛教影片 (橫式) ---
     videos: collection({
-      label: '影音專區管理',
+      label: '衛教影片管理 (橫式)',
       slugField: 'title',
       path: 'src/content/videos/*',
       schema: {
         title: fields.slug({ name: { label: '影片標題' } }),
         date: fields.date({ label: '發布日期', defaultValue: { kind: 'today' } }),
 
-        platform: fields.select({
-          label: '影片平台',
-          defaultValue: 'youtube',
-          options: [
-            { label: 'YouTube (長影片/Shorts)', value: 'youtube' },
-            { label: 'Instagram (Reels)', value: 'instagram' },
-          ],
-        }),
-
-        videoUrl: fields.url({
-          label: '影片連結 (URL)',
-          description: '請直接貼上 YouTube 或 Instagram 的完整網址。系統會自動抓取 ID。',
+        youtubeUrl: fields.url({
+          label: 'YouTube 連結 (URL)',
+          description: '請貼上完整網址 (例如: https://www.youtube.com/watch?v=dQw4w9WgXcQ)。',
         }),
 
         category: fields.select({
@@ -369,20 +380,13 @@ export default config({
 
         customThumbnail: fields.image({
           label: '自訂封面圖 (選填)',
-          description: '若留空，將嘗試自動抓取 YouTube 縮圖。IG 影片建議手動上傳。',
+          description: '若留空，將嘗試自動抓取 YouTube 縮圖。',
           directory: 'src/content/videos',
           publicPath: './',
         }),
 
         description: fields.text({
           label: '影片簡介',
-          multiline: true,
-        }),
-
-        // 👇👇👇 墊高用欄位 👇👇👇
-        z_layout_spacer: fields.text({
-          label: '--------- ⬇️ 頁面底部墊高區 (請忽略) ⬇️ ---------',
-          description: '此欄位僅用於解決無法捲動到底部的問題，請勿填寫。',
           multiline: true,
         }),
       },

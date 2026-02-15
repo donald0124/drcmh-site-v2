@@ -115,19 +115,29 @@ const {
           </div>
         </div>
 
-        {/* 醫師的話 (引用) */}
-        <div class="pt-8 border-t border-highlight">
-           <blockquote class="text-text italic leading-relaxed text-sm">
-             「{doctorWord || "致力於透過細膩的溝通與精準的治療，協助您卸下心理負擔，重拾自信生活。"}」 
-           </blockquote>
-           <div class="mt-4 flex items-center gap-3">
-              <div class="w-8 h-0.5 bg-accent"></div>
-              <span class="font-serif font-bold text-primary text-sm">Dr. Chou Meng-Han</span>
-           </div>
-        </div>
 
       </div>
 
+    </div>
+
+    {/* 醫師的話 (引用) - 改為大版面呈現 */}
+    <div class="mt-20 pt-16 border-t border-highlight fade-in-up">
+      <div class="max-w-4xl mx-auto text-center">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-highlight text-accent mb-8">
+          <Stethoscope size={24} />
+        </div>
+        
+        <blockquote class="text-lg md:text-2xl font-serif text-primary leading-loose whitespace-pre-wrap mb-10 px-4 italic">
+          「{doctorWord || "致力於透過細膩的溝通與精準的治療，協助您卸下心理負擔，重拾自信生活。"}」
+        </blockquote>
+        
+        <div class="flex flex-col items-center gap-4">
+          <div class="w-16 h-1 bg-accent/30 rounded-full"></div>
+          <p class="font-serif font-bold text-primary text-xl tracking-wider">
+            {doctorName} 醫師 <span class="text-sm font-sans font-normal text-text/60 ml-2">Dr. Chou Meng-Han</span>
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 </section>

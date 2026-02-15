@@ -1,0 +1,48 @@
+---
+import { getEntry } from 'astro:content';
+import { Plus, Minus } from 'lucide-react';
+
+const faq = await getEntry('faq', 'list');
+const { title = '常見問答', subtitle = '解除您的疑惑，安心看診', items = [] } = faq?.data || {};
+
+if (!items || items.length === 0) {
+  return null;
+}
+---
+
+<section id="faq" class="py-24 bg-white relative">
+  <div class="container mx-auto px-6">
+    {/* Section Heading */}
+    <div class="text-center mb-16">
+      <h3 class="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-3">FAQ</h3>
+      <h2 class="text-3xl md:text-4xl font-serif font-bold text-primary">{title}</h2>
+      {subtitle && <p class="text-text/60 mt-4 text-lg">{subtitle}</p>}
+    </div>
+
+    <div class="max-w-3xl mx-auto space-y-4">
+      {items.map((item, index) => (
+        <details class="group bg-surface rounded-2xl overflow-hidden transition-all duration-300 open:bg-highlight/30 open:shadow-sm">
+          <summary class="flex justify-between items-center p-6 cursor-pointer list-none text-primary font-bold text-lg select-none">
+            <span class="flex gap-4 text-left">
+                <span class="text-accent font-serif text-xl opacity-80">Q{index + 1}.</span>
+                <span class="pt-0.5">{item.question}</span>
+            </span>
+            <span class="transition-transform duration-300 group-open:rotate-45 shrink-0 ml-4">
+              <Plus size={24} className="text-accent" />
+            </span>
+          </summary>
+          <div class="px-6 pb-6 pl-[3.75rem] text-text/80 leading-relaxed whitespace-pre-wrap">
+            {item.answer}
+          </div>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Removing default triangle for details */
+  summary::-webkit-details-marker {
+    display: none;
+  }
+</style>

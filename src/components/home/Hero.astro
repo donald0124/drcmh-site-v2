@@ -19,20 +19,20 @@ const content = {
 };
 ---
 
-<section class="min-h-[90vh] flex items-center pt-24 md:pt-32 overflow-hidden bg-bg">
+<section class="min-h-fit flex items-start md:items-center py-3 md:py-8 overflow-hidden bg-bg relative">
   
-  {/* 1. 背景裝飾字 (UROLOGY) - 大氣排版 */}
-  <div class="absolute top-1/4 -left-12 md:left-0 text-[18vw] md:text-[15vw] font-serif font-bold text-primary/5 pointer-events-none select-none leading-none z-0">
+  {/* 1. 背景裝飾字 (UROLOGY) */}
+  <div class="absolute top-[10%] -left-12 md:left-0 text-[18vw] md:text-[15vw] font-serif font-bold text-primary/5 pointer-events-none select-none leading-none z-0">
     UROLOGY
   </div>
 
-  {/* 2. 背景裝飾色塊 (增加層次感) */}
+  {/* 2. 背景裝飾色塊 */}
   <div class="absolute top-0 right-0 w-2/3 h-full bg-gradient-to-l from-[#F0EBE3] to-transparent z-0 opacity-60"></div>
 
-  <div class="container mx-auto px-6 relative z-10 flex flex-col md:flex-row items-center">
+  <div class="container mx-auto px-6 relative z-10 flex flex-col-reverse md:flex-row items-center gap-8 md:gap-0">
     
-    {/* 3. 左側文字區塊 */}
-    <div class="w-full md:w-5/12 pt-8 md:pt-0 z-20 order-2 md:order-1 fade-in-up">
+    {/* 3. 左側文字區塊 (Mobile: 下方, Desktop: 左側) */}
+    <div class="w-full md:w-5/12 z-20 fade-in-up pb-12 md:pb-0">
       
       {/* 標籤 */}
       <div class="inline-block px-3 py-1 mb-6 border border-accent/50 rounded-full bg-white/50 backdrop-blur-sm">
@@ -52,7 +52,6 @@ const content = {
       
       {/* 職稱 */}
       <h2 class="text-xl md:text-2xl font-medium mb-6 text-primary/80 flex items-center gap-3">
-        {/* 修正：React 元件使用 className */}
         <Award className="text-accent" size={24} />
         {content.subTitle}
       </h2>
@@ -74,22 +73,19 @@ const content = {
           class="group flex items-center gap-3 px-8 py-4 bg-primary text-white rounded-full transition-all hover:bg-accent hover:shadow-lg hover:-translate-y-1"
         >
            <span class="font-bold tracking-wide">預約門診</span>
-           {/* 修正：React 元件使用 className */}
            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform"/>
         </a>
       </div>
     </div>
 
-    {/* 4. 右側醫師形象照區塊 */}
-    <div class="w-full md:w-7/12 relative mt-12 md:mt-0 h-[50vh] md:h-[80vh] order-1 md:order-2 flex justify-center md:justify-end items-end">
+    {/* 4. 右側醫師形象照區塊 (Mobile: 上方, Desktop: 右側) */}
+    {/* 關鍵修改：移除 absolute 定位，改用 Flex 佈局讓圖片自然佔據空間 */}
+    <div class="w-full md:w-7/12 flex justify-center relative ">
        
-       {/* 圖片容器 (遮罩效果) */}
-       <div class="relative w-full max-w-lg md:max-w-xl aspect-[3/4] md:aspect-[4/5] z-10">
-          {/*<div class="w-full h-full relative rounded-tr-[6rem] rounded-bl-[6rem] rounded-tl-3xl rounded-br-3xl overflow-hidden shadow-2xl bg-gradient-to-b from-[#E3Ddd5] to-[#F0EBE3] border-8 border-white">*/}
-          <div class="w-full h-full relative rounded-[2.5rem] overflow-hidden shadow-2xl bg-gradient-to-b from-[#E3Ddd5] to-[#F0EBE3] border-8 border-white">   
-             {/* 浮動效果容器 */}
-             <div class="absolute top-0 left-1/2 -translate-x-1/2 h-auto w-[140%] md:w-[120%]">
-                {/* 備註：HTML/Astro 元件繼續使用 class */}
+       <div class="relative w-full max-w-lg md:max-w-xl aspect-[4/5] md:aspect-[4/5] z-10">
+          <div class="w-full h-full relative rounded-[2.5rem] overflow-hidden shadow-2xl bg-gradient-to-b from-[#E3Ddd5] to-[#F0EBE3] border-3 border-white">   
+             {/* 圖片容器：這裡使用 flex 讓圖片撐滿容器 */}
+             <div class="w-full h-full relative">
                 <Image 
                   src={doctorProfile}
                   alt="周孟翰醫師專業形象照" 
@@ -97,9 +93,7 @@ const content = {
                   loading="eager"
                 />
              </div>
-       
           </div>
-
        </div>
     </div>
 

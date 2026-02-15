@@ -32,8 +32,6 @@ const blog = defineCollection({
       }),
     ]).default({ discriminant: false }), // 給個預設值避免報錯
 
-    // 墊高欄位
-    z_layout_spacer: z.string().optional(),
   }),
 });
 
@@ -47,27 +45,33 @@ const news = defineCollection({
     category: z.enum(['announcement', 'closed', 'activity']).default('announcement'),
     coverImage: image().optional(),
 
-    // 墊高欄位
-    z_layout_spacer: z.string().optional(),
   }),
 });
 
-// 3. 影音專區 (Videos) [NEW]
+// 3. 衛教影片 (Videos) [MODIFIED]
 const videos = defineCollection({
-  loader: glob({ pattern: "**/*.yaml", base: "./src/content/videos" }), // 注意: 如果 Keystatic 存成 yaml 這裡就要改
-  // Keystatic 預設 collection 可能是 .mdoc 或 .yaml，請檢查實際產生的檔案副檔名
-  // 假設 videos 是沒有 content 欄位的，Keystatic 通常存成 .yaml 或 .json
+  loader: glob({ pattern: "*.yaml", base: "./src/content/videos" }),
   schema: ({ image }) => z.object({
     title: z.string(),
     date: z.date(),
-    platform: z.enum(['youtube', 'instagram']).default('youtube'),
-    videoUrl: z.string().url(),
+    youtubeUrl: z.string().url(),
     category: z.enum(['education', 'vlog', 'media']).default('education'),
     customThumbnail: image().optional(),
     description: z.string().optional(),
+  }),
+});
 
-    // 墊高欄位
-    z_layout_spacer: z.string().optional(),
+// 4. 短影音 (Old Collection -> New Singleton) [MODIFIED]
+const shorts = defineCollection({
+  loader: glob({ pattern: "index.yaml", base: "./src/content/shorts" }),
+  schema: () => z.object({
+    list: z.array(
+      z.object({
+        title: z.string(),
+        date: z.date(),
+        youtubeUrl: z.string().url(),
+      })
+    ).optional(),
   }),
 });
 
@@ -89,8 +93,6 @@ const settings = defineCollection({
     bookingLink: z.string().url().optional(),
     googleMapEmbedLink: z.string().url().optional(), // [NEW]
 
-    // 墊高欄位
-    z_layout_spacer: z.string().optional(),
   }),
 });
 
@@ -124,8 +126,6 @@ const schedule = defineCollection({
       })
     ).optional(),
 
-    // 墊高欄位
-    z_layout_spacer: z.string().optional(),
   }),
 });
 
@@ -140,10 +140,27 @@ const resume = defineCollection({
   }),
 });
 
+// 7. 常見問答 (FAQ)
+const faq = defineCollection({
+  loader: glob({ pattern: "list.yaml", base: "./src/content/faq" }),
+  schema: () => z.object({
+    title: z.string().default('常見問答'),
+    subtitle: z.string().optional(),
+    items: z.array(
+      z.object({
+        question: z.string(),
+        answer: z.string(),
+      })
+    ).optional(),
+  }),
+});
+
 export const collections = {
+  'faq': faq,
   'blog': blog,
   'news': news,
   'videos': videos,
+  'shorts': shorts,
   'settings': settings,
   'schedule': schedule,
   'resume': resume

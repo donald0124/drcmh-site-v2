@@ -2,28 +2,34 @@
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/common/Header.astro';
 import Footer from '../../components/common/Footer.astro';
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import { Image } from 'astro:assets';
 
-// 1. 取得影片
+// 1. 取得兩種類型的影片
 const videos = await getCollection('videos');
+const shortsEntry = await getEntry('shorts', 'index');
+const shortsList = shortsEntry?.data?.list || [];
 
 // 2. 日期排序 (新到舊)
 const sortedVideos = videos.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const sortedShorts = shortsList.sort((a, b) => new Date(b.date).valueOf() - new Date(a.date).valueOf());
 
-// 3. 定義分類
-const categories = [
-  { id: 'all', label: '全部影片' },
-  { id: 'education', label: '衛教知識' },
-  { id: 'vlog', label: '醫師花絮' },
-  { id: 'media', label: '媒體報導' },
-];
-
-// 輔助函式
+// 輔助函式：取得 YouTube ID
 function getYouTubeID(url: string) {
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
   const match = url.match(regExp);
   return (match && match[2].length === 11) ? match[2] : null;
+}
+
+// 輔助函式：取得 YouTube Shorts ID
+function getShortsID(url: string) {
+  // 支援 https://www.youtube.com/shorts/VIDEO_ID
+  const regExp = /shorts\/([a-zA-Z0-9_-]+)/;
+  const match = url.match(regExp);
+  if (match && match[1]) return match[1];
+
+  // 或是普通網址
+  return getYouTubeID(url);
 }
 
 function formatDate(date: Date) {
@@ -45,125 +51,157 @@ function formatDate(date: Date) {
       <h1 class="text-4xl md:text-5xl font-serif font-bold text-primary mb-4">影音專區</h1>
       <p class="text-text max-w-2xl mx-auto leading-relaxed">
         影像紀錄，讓醫學更親近。<br/>
-        這裡匯集了衛教解說、媒體訪談與診間的溫馨日常。
+        這裡匯集了衛教解說與診間的溫馨日常。
       </p>
     </div>
   </section>
 
-  {/* === 2. 影片列表區 === */}
+  {/* === 2. 影片列表區 (Tab 切換) === */}
   <section class="py-12 bg-surface min-h-screen">
     <div class="container mx-auto px-4 md:px-6">
 
-      {/* 分類篩選 */}
-      <div class="flex flex-wrap justify-center gap-3 mb-12">
-        {categories.map(cat => (
-          <button 
-            class={`filter-btn px-5 py-2 rounded-full text-sm font-bold transition-all border 
-              ${cat.id === 'all' 
-                ? 'bg-primary text-white border-transparent shadow-md active' 
-                : 'bg-white text-text border-highlight hover:border-accent hover:text-accent hover:-translate-y-0.5'
-              }`}
-            data-filter={cat.id}
-          >
-            {cat.label}
-          </button>
-        ))}
+      {/* Tab 按鈕 */}
+      <div class="flex flex-wrap justify-center gap-4 mb-12">
+        <button 
+          id="tab-shorts"
+          class="tab-btn active px-6 py-3 rounded-full text-lg font-bold transition-all border border-transparent bg-primary text-white shadow-md"
+          data-target="content-shorts"
+        >
+          短影音
+        </button>
+        <button 
+          id="tab-videos"
+          class="tab-btn px-6 py-3 rounded-full text-lg font-bold transition-all border border-highlight bg-white text-text shadow-sm"
+          data-target="content-videos"
+        >
+          衛教影片
+        </button>
       </div>
 
-      {/* Grid 列表 */}
-      <div class="grid gap-x-8 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
-        {sortedVideos.map((video) => {
-          let isYouTube = video.data.platform === 'youtube';
-          let ytId = isYouTube ? getYouTubeID(video.data.videoUrl) : null;
+      {/* === Tab 內容 2: 衛教影片 (橫式) === */}
+      <div id="content-videos" class="tab-content grid gap-x-8 gap-y-12 md:grid-cols-2 lg:grid-cols-3 fade-in-up hidden">
+        {sortedVideos.length === 0 ? (
+           <div class="col-span-full text-center py-20 text-gray-400">
+             <i class="fa-solid fa-video-slash text-4xl mb-4"></i>
+             <p>目前尚無衛教影片，敬請期待。</p>
+           </div>
+        ) : sortedVideos.map((video) => {
+          let ytId = getYouTubeID(video.data.youtubeUrl);
           let autoThumb = ytId ? `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg` : null;
 
           return (
-            <div class="video-card group block" data-category={video.data.category}>
-              
-              {/* === 上方：縮圖與播放器區塊 === */}
-              {/* 如果是 YouTube -> 使用 div 作為容器，點擊後載入 iframe
-                 如果是 Instagram -> 維持 a 連結開啟新分頁 (因為 IG 很難完美嵌入)
-              */}
-              {isYouTube ? (
-                <div 
-                  class="yt-player-container relative aspect-video rounded-2xl overflow-hidden bg-gray-100 shadow-sm group-hover:shadow-xl transition-all duration-300 cursor-pointer"
-                  data-yt-id={ytId}
-                >
-                  {/* 圖片本體 (尚未點擊時顯示) */}
-                  <div class="thumbnail-wrapper w-full h-full absolute inset-0">
-                    {video.data.customThumbnail ? (
-                       <Image 
-                         src={video.data.customThumbnail} 
-                         alt={video.data.title}
-                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                         width={600}
-                         height={338}
-                       />
-                    ) : autoThumb ? (
-                       <img 
-                         src={autoThumb} 
-                         alt={video.data.title}
-                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                       />
-                    ) : (
-                       <div class="w-full h-full flex items-center justify-center bg-gray-800 text-gray-500">
-                         <i class="fa-solid fa-film text-4xl"></i>
-                       </div>
-                    )}
-
-                    {/* 播放按鈕 (懸停時放大) */}
-                    <div class="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                      <div class="w-16 h-16 bg-white/90 backdrop-blur rounded-full flex items-center justify-center pl-1 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                        <i class="fa-solid fa-play text-2xl text-red-600"></i>
-                      </div>
+            <div class="video-card group block">
+              {/* 縮圖與播放器 */}
+              <div 
+                class="yt-player-container relative aspect-video rounded-2xl overflow-hidden bg-gray-100 shadow-sm group-hover:shadow-xl transition-all duration-300 cursor-pointer"
+                data-yt-id={ytId}
+                data-type="landscape"
+              >
+                <div class="thumbnail-wrapper w-full h-full absolute inset-0">
+                  {video.data.customThumbnail ? (
+                     <Image 
+                       src={video.data.customThumbnail} 
+                       alt={video.data.title}
+                       class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                       width={600}
+                       height={338}
+                     />
+                  ) : autoThumb ? (
+                     <img 
+                       src={autoThumb} 
+                       alt={video.data.title}
+                       class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                     />
+                  ) : (
+                     <div class="w-full h-full flex items-center justify-center bg-gray-800 text-gray-500">
+                       <i class="fa-solid fa-film text-4xl"></i>
+                     </div>
+                  )}
+                  {/* 播放按鈕 */}
+                  <div class="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                    <div class="w-16 h-16 bg-white/90 backdrop-blur rounded-full flex items-center justify-center pl-1 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                      <i class="fa-solid fa-play text-2xl text-red-600"></i>
                     </div>
                   </div>
-
-                  {/* 標籤 */}
-                  <div class="absolute top-3 left-3 pointer-events-none">
-                    <span class="bg-black/60 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-full">
-                      {video.data.category === 'education' ? '衛教' : 
-                       video.data.category === 'vlog' ? '花絮' : '媒體'}
-                    </span>
-                  </div>
                 </div>
-              ) : (
-                /* Instagram 或是其他平台：維持連結模式 */
-                <a 
-                  href={video.data.videoUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  class="relative aspect-video rounded-2xl overflow-hidden bg-gray-100 shadow-sm group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-300 block"
-                >
-                   {/* ... (Instagram 縮圖邏輯同上，略微簡化) ... */}
-                   {/* 這裡您可以放 Instagram 專屬的圖片處理 */}
-                   <div class="w-full h-full bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 flex items-center justify-center text-white">
-                      <i class="fa-brands fa-instagram text-5xl"></i>
-                   </div>
-                   <div class="absolute bottom-3 right-3 bg-black/80 text-white text-[10px] px-2 py-0.5 rounded">
-                      Instagram
-                   </div>
-                </a>
-              )}
+                {/* 標籤 */}
+                <div class="absolute top-3 left-3 pointer-events-none">
+                  <span class="bg-black/60 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-full">
+                    {video.data.category === 'education' ? '衛教' : 
+                     video.data.category === 'vlog' ? '花絮' : '媒體'}
+                  </span>
+                </div>
+              </div>
 
-              {/* === 下方：文字資訊 === */}
+              {/* 文字資訊 */}
               <div class="mt-4 px-1">
                 <div class="flex items-center gap-2 mb-2 text-xs text-gray-400 font-medium">
                    <i class="fa-regular fa-clock"></i>
                    <span>{formatDate(video.data.date)}</span>
                 </div>
-
-                {/* 標題：點擊依然可以連回 YouTube 本站 */}
                 <h3 class="text-lg font-bold text-gray-800 leading-snug line-clamp-2">
-                  <a 
-                    href={video.data.videoUrl} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    class="hover:text-primary transition-colors"
-                  >
+                  <a href={video.data.youtubeUrl} target="_blank" rel="noopener noreferrer" class="hover:text-primary transition-colors">
                     {video.data.title}
                   </a>
                 </h3>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* === Tab 內容 1: 短影音 (直式) === */}
+      <div id="content-shorts" class="tab-content grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 fade-in-up">
+        {sortedShorts.length === 0 ? (
+           <div class="col-span-full text-center py-20 text-gray-400">
+             <i class="fa-solid fa-mobile-screen text-4xl mb-4"></i>
+             <p>目前尚無短影音，敬請期待。</p>
+           </div>
+        ) : sortedShorts.map((video) => {
+          let ytId = getShortsID(video.youtubeUrl);
+          // Shorts 的縮圖通常還是 maxresdefault，但有時需要 mqdefault。暫用 maxresdefault。
+          let autoThumb = ytId ? `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg` : null;
+
+          return (
+            <div class="video-card group block">
+              {/* 縮圖與播放器 (直式 9:16) */}
+              <div 
+                class="yt-player-container relative aspect-[9/16] rounded-2xl overflow-hidden bg-gray-100 shadow-sm group-hover:shadow-xl transition-all duration-300 cursor-pointer border border-white/50"
+                data-yt-id={ytId}
+                data-type="portrait"
+              >
+                <div class="thumbnail-wrapper w-full h-full absolute inset-0">
+                  {autoThumb ? (
+                     <img 
+                       src={autoThumb} 
+                       alt={video.title}
+                       class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                     />
+                  ) : (
+                     <div class="w-full h-full flex items-center justify-center bg-gray-800 text-gray-500">
+                       <i class="fa-solid fa-film text-4xl"></i>
+                     </div>
+                  )}
+                  {/* 播放按鈕 */}
+                  <div class="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                    <div class="w-12 h-12 bg-white/90 backdrop-blur rounded-full flex items-center justify-center pl-1 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                      <i class="fa-solid fa-play text-xl text-red-600"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 文字資訊 */}
+              <div class="mt-3 px-1">
+                <h3 class="text-sm md:text-base font-bold text-gray-800 leading-snug line-clamp-2">
+                  <a href={video.youtubeUrl} target="_blank" rel="noopener noreferrer" class="hover:text-primary transition-colors">
+                    {video.title}
+                  </a>
+                </h3>
+                 <div class="flex items-center gap-2 mt-1 text-[10px] md:text-xs text-gray-400 font-medium">
+                   <i class="fa-regular fa-clock"></i>
+                   <span>{formatDate(video.date)}</span>
+                </div>
               </div>
             </div>
           );
@@ -177,31 +215,38 @@ function formatDate(date: Date) {
 
 </Layout>
 
+<style>
+  /* Tab 按鈕懸停效果 (比照部落格標籤) */
+  .tab-btn:not(.active):hover {
+    @apply border-accent text-accent -translate-y-0.5 shadow-lg;
+  }
+  
+  /* 選中狀態 hover 時不顯示 accent 色，也不位移 */
+  .tab-btn.active:hover {
+    @apply transform-none text-white border-transparent cursor-default;
+  }
+</style>
+
 <script>
-  // 1. YouTube 點擊播放邏輯
+  // 1. YouTube 點擊播放邏輯 (通用：橫式與直式)
   function initYouTubePlayers() {
-    // 選取所有還沒綁定過的播放器容器
     const containers = document.querySelectorAll('.yt-player-container:not([data-bound="true"])');
     
     containers.forEach(container => {
-      // 標記為已綁定，避免重複執行
       container.setAttribute('data-bound', 'true');
-
       container.addEventListener('click', (e) => {
-        // 阻止事件冒泡 (雖然這裡是 div 但保險起見)
         e.stopPropagation();
-
         const id = container.getAttribute('data-yt-id');
+        const type = container.getAttribute('data-type');
         if (!id) return;
 
-        // 取得當前網站網域 (解決 Error 153 的關鍵)
         const origin = window.location.origin;
+        // Shorts 與 一般影片其實都能用 embed/ID 播放，助於比例不同
+        const src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&playsinline=1&origin=${origin}`;
 
-        // 直接用 HTML 字串替換，確保屬性完整
-        // 加上 playsinline=1 讓手機版不會強制全螢幕
         container.innerHTML = `
           <iframe 
-            src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0&playsinline=1&origin=${origin}" 
+            src="${src}" 
             title="YouTube video player" 
             frameborder="0" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
@@ -213,48 +258,48 @@ function formatDate(date: Date) {
     });
   }
 
-  // 2. 篩選邏輯
-  function initFilters() {
-    const buttons = document.querySelectorAll('.filter-btn');
-    const items = document.querySelectorAll('.video-card');
+  // 2. Tab 切換邏輯
+  function initTabs() {
+    const tabs = document.querySelectorAll('.tab-btn');
+    const contents = document.querySelectorAll('.tab-content');
 
-    if (!buttons.length) return;
+    if (!tabs.length) return;
 
-    buttons.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        // 重置按鈕樣式
-        buttons.forEach(b => {
-          b.classList.remove('bg-primary', 'text-white', 'shadow-md', 'border-transparent', 'active');
-          b.classList.add('bg-white', 'text-text', 'border-highlight');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        const target = e.currentTarget as HTMLElement;
+        if (target.classList.contains('active')) return;
+
+        // 1. 重置所有 Tab 樣式
+        tabs.forEach(t => {
+          t.classList.remove('bg-primary', 'text-white', 'shadow-md', 'active', 'border-transparent');
+          t.classList.add('bg-white', 'text-text', 'border-highlight');
         });
-        
-        const target = e.currentTarget; // 使用 currentTarget 確保抓到 button
+
+        // 2. 啟用當前 Tab 樣式
         target.classList.remove('bg-white', 'text-text', 'border-highlight');
-        target.classList.add('bg-primary', 'text-white', 'shadow-md', 'border-transparent', 'active');
+        target.classList.add('bg-primary', 'text-white', 'shadow-md', 'active', 'border-transparent');
 
-        const filter = target.getAttribute('data-filter');
-
-        items.forEach(item => {
-          const category = item.getAttribute('data-category');
-          const el = item; // TypeScript轉型在 script 標籤內通常不需要，直接用
-          
-          if (filter === 'all' || category === filter) {
-            el.style.display = 'block';
-            el.animate([
-              { opacity: 0, transform: 'scale(0.95)' },
-              { opacity: 1, transform: 'scale(1)' }
+        // 3. 切換內容顯示
+        const targetId = target.getAttribute('data-target');
+        contents.forEach(content => {
+          if (content.id === targetId) {
+            content.classList.remove('hidden');
+            // 觸發簡單的淡入動畫
+            content.animate([
+              { opacity: 0, transform: 'translateY(10px)' },
+              { opacity: 1, transform: 'translateY(0)' }
             ], { duration: 300, fill: 'forwards' });
           } else {
-            el.style.display = 'none';
+            content.classList.add('hidden');
           }
         });
       });
     });
   }
 
-  // 支援 View Transitions (換頁後重新綁定)
   document.addEventListener('astro:page-load', () => {
     initYouTubePlayers();
-    initFilters();
+    initTabs();
   });
 </script>
