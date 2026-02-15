@@ -1,6 +1,7 @@
 ---
 import MobileMenu from './MobileMenu.jsx';
-import SearchWidget from './SearchWidget.jsx'; // 🟢 改用新元件
+import SearchWidget from './SearchWidget.jsx';
+import SearchModal from './SearchModal.jsx'; 
 
 const menuItems = [
   { label: '關於醫師', href: '/#about' },
@@ -62,14 +63,8 @@ const menuItems = [
 
     {/* 3. 手機版/平板版 (Mobile/Tablet) */}
     <div class="flex items-center gap-2 lg:hidden">
-      {/* 搜尋 widget (手機版會顯示放大鏡) */}
-      <a 
-        href="/search" 
-        class="p-2 text-text hover:bg-gray-100 rounded-full transition-colors"
-        aria-label="搜尋"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-      </a>
+      {/* 搜尋 widget (手機版會顯示彈窗) */}
+      <SearchModal client:load />
       {/* 漢堡選單 */}
       <MobileMenu client:media="(max-width: 1024px)" menuItems={menuItems} />
     </div>
