@@ -4,7 +4,7 @@ import { glob } from 'astro/loaders';
 
 // 1. 衛教文章 (Blog)
 const blog = defineCollection({
-  loader: glob({ pattern: "**/*.mdoc", base: "./src/content/blog" }),
+  loader: glob({ pattern: "**/*.mdx", base: "./src/content/blog" }),
   schema: ({ image }) => z.object({
     title: z.string(),
     date: z.date(), // 或是 z.string().transform((str) => new Date(str)), 視情況而定
@@ -37,7 +37,7 @@ const blog = defineCollection({
 
 // 2. 最新消息 (News) [NEW]
 const news = defineCollection({
-  loader: glob({ pattern: "**/*.mdoc", base: "./src/content/news" }),
+  loader: glob({ pattern: "**/*.mdx", base: "./src/content/news" }),
   schema: ({ image }) => z.object({
     title: z.string(),
     date: z.date(),

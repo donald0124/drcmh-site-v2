@@ -62,12 +62,7 @@ const formattedDate = post.data.date.toISOString().split('T')[0].replace(/-/g, '
         </div>
       )}
       
-      {/* 第一個標籤 (Badge) - 顯示在圖片右上角 */}
-      {post.data.tags && post.data.tags.length > 0 && (
-        <span class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 text-xs font-bold text-primary rounded-full shadow-sm z-10 border border-gray-100">
-          {post.data.tags[0]}
-        </span>
-      )}
+
     </div>
 
     {/* 內容區域 */}
@@ -80,22 +75,24 @@ const formattedDate = post.data.date.toISOString().split('T')[0].replace(/-/g, '
           <span>{formattedDate}</span>
         </div>
         
-        {/* 如果有第二個標籤，顯示在這裡 */}
-        {post.data.tags && post.data.tags.length > 1 && (
-          <>
-            <span class="w-1 h-1 rounded-full bg-accent"></span>
-            <div class="flex items-center gap-1">
-              <Tag size={12} />
-              <span class="truncate max-w-[80px]">{post.data.tags[1]}</span>
-            </div>
-          </>
-        )}
+
       </div>
 
       {/* 標題 */}
       <h3 class="text-xl font-serif font-bold text-primary mb-3 leading-snug line-clamp-2 group-hover:text-accent transition-colors">
         {post.data.title}
       </h3>
+
+      {/* 標題下方顯示所有標籤 */}
+      {post.data.tags && post.data.tags.length > 0 && (
+        <div class="flex flex-wrap gap-2 mb-3">
+          {post.data.tags.map((tag) => (
+            <span class="px-2 py-1 rounded-md bg-gray-100 text-gray-600 text-xs font-medium group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+              #{tag}
+            </span>
+          ))}
+        </div>
+      )}
 
       {/* 摘要 */}
       <p class="text-sm text-text/80 leading-relaxed line-clamp-3 mb-6 flex-grow">
