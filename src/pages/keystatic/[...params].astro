@@ -1,0 +1,8 @@
+---
+import { makePage } from '@keystatic/astro/page';
+import keystaticConfig from '../../../../keystatic.config';
+
+export const prerender = false; // 這行在 Cloudflare 上非常重要
+const page = await makePage(keystaticConfig);
+---
+<page.Component />
