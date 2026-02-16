@@ -270,20 +270,13 @@ export default config({
           description: '上傳需要一點時間。封面圖片，建議 1200x628 像素，比例約 1.91:1，有助於社群分享時顯示效果。',
         }),
 
-        content: fields.document({
+        content: fields.mdx({
           label: '文章內文',
-          formatting: {
-            headingLevels: [2, 3, 4, 5, 6], // 限制只能用 H2 ~ H6
-            blockTypes: true, // 開啟引用 (Blockquote) 等功能
-            alignment: true,  // 開啟置左/置中/置右
-            listTypes: true,  // 開啟列表 (ul/ol)
-          },
-          dividers: true,
-          links: true,
-          images: {
-            // 👇 圖片存到當前目錄 (./)
-            directory: 'src/content/blog',
-            publicPath: './',
+          options: {
+            image: {
+              directory: 'src/content/blog',
+              publicPath: './',
+            }
           },
         }),
 
@@ -352,11 +345,14 @@ export default config({
           publicPath: './',
         }),
 
-        content: fields.document({
+        content: fields.mdx({
           label: '公告內容',
-          formatting: true,
-          links: true,
-          images: { directory: 'src/content/news', publicPath: './' },
+          options: {
+            image: {
+              directory: 'src/content/news',
+              publicPath: './',
+            }
+          }
         }),
 
       },

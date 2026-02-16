@@ -4,7 +4,7 @@ import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 import partytown from '@astrojs/partytown';
-//mport keystatic from '@keystatic/astro';
+import keystatic from '@keystatic/astro';
 import cloudflare from '@astrojs/cloudflare';
 import mdx from '@astrojs/mdx';
 import markdoc from '@astrojs/markdoc';
@@ -30,15 +30,15 @@ export default defineConfig({
         forward: ["dataLayer.push"],
       },
     }),
-    //keystatic(), 
+    keystatic(),
     mdx(),
     markdoc()],
 
 
   site: 'https://drcmh-site-v2.pages.dev',
-  output: 'static',
+  output: 'server',
   adapter: cloudflare({
-    // 這裡可以針對圖片做優化設定，讓 Cloudflare 幫你處理圖片
+    // ✅ 最佳解：部署時壓縮圖片 (免費且高效)
     imageService: 'compile',
   }),
 
