@@ -7,9 +7,15 @@
 @layer base {
   html {
     @apply font-sans text-text bg-bg;
-    
+
   }
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-serif text-primary;
   }
 }
@@ -21,26 +27,23 @@
 
 
 @layer components {
+
   /* 讓所有 Markdown 裡的引用區塊 (>) 自動變成精美提示框 */
   .prose blockquote {
     @apply relative bg-surface p-6 rounded-r-xl border-l-4 border-accent not-italic shadow-sm my-8;
-    quotes: none; /* 移除預設引號 */
+    quotes: none;
+    /* 移除預設引號 */
   }
 
-  /* 加上一個 "醫師筆記" 的偽元素標籤 */
-  .prose blockquote::before {
-    content: "💡 醫師筆記";
-    @apply absolute -top-3 left-4 bg-accent text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm;
-  }
-  
+
+
   /* 調整引用文字樣式 */
   .prose blockquote p {
     @apply text-text/80 font-medium leading-relaxed m-0;
   }
-  
+
   /* 讓 Markdown 裡的圖片自動變漂亮 */
   .prose img {
-    @apply rounded-xl shadow-md mx-auto; 
+    @apply rounded-xl shadow-md mx-auto;
   }
 }
-

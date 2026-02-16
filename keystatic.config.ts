@@ -265,19 +265,28 @@ export default config({
         }),
         coverImage: fields.image({
           label: '文章封面圖',
-          directory: 'src/content/blog', // 放在文章同級目錄，便於 Astro Image 優化
-          publicPath: './',
+          directory: 'src/assets/images/blog',
+          publicPath: '../../../assets/images/blog/',
           description: '上傳需要一點時間。封面圖片，建議 1200x628 像素，比例約 1.91:1，有助於社群分享時顯示效果。',
         }),
 
         content: fields.mdx({
           label: '文章內文',
           options: {
+            bold: true,
+            italic: true,
+            strikethrough: true,
+            code: true,
+            heading: [2, 3, 4, 5, 6],
+            blockquote: true,
+            link: true,
+            divider: true,
+            table: true,
             image: {
               directory: 'src/content/blog',
-              publicPath: './',
+              publicPath: '../../../content/blog/',
             }
-          },
+          }
         }),
 
         // SEO 設定：給 Google 看
@@ -341,18 +350,28 @@ export default config({
 
         coverImage: fields.image({
           label: '公告封面圖 (選填)',
-          directory: 'src/content/news',
-          publicPath: './',
+          directory: 'src/assets/images/news',
+          publicPath: '../../assets/images/news/',
         }),
 
         content: fields.mdx({
           label: '公告內容',
           options: {
+            bold: true,
+            italic: true,
+            strikethrough: true,
+            code: true,
+            heading: [2, 3, 4, 5, 6],
+            blockquote: true,
+
+            link: true,
+            divider: true,
+            table: true,
             image: {
-              directory: 'src/content/news',
-              publicPath: './',
+              directory: 'src/content/blog',
+              publicPath: '../../../content/blog/',
             }
-          }
+          },
         }),
 
       },
