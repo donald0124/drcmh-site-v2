@@ -72,7 +72,7 @@ const readTime = Math.ceil((post.body?.length || 0) / 500);
     <div class="h-full bg-accent w-0 transition-all duration-150 ease-out" id="progress-bar"></div>
   </div>
 
-  <article class="pt-24 md:pt-32 pb-16 bg-bg min-h-screen">
+  <article class="pt-20 md:pt-24 pb-16 bg-bg min-h-screen">
     
     {/* 1. 文章 Header (Hero) */}
     <header class="container mx-auto px-6 mb-12 max-w-5xl">
@@ -120,7 +120,7 @@ const readTime = Math.ceil((post.body?.length || 0) / 500);
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
         
         {/* 主要內容區 */}
-        <div class="lg:col-span-8">
+        <div class="lg:col-span-9">
           {post.data.coverImage && (
             <div class="rounded-2xl overflow-hidden shadow-lg mb-10 aspect-video bg-gray-200">
                <Image 
@@ -137,7 +137,7 @@ const readTime = Math.ceil((post.body?.length || 0) / 500);
              <TableOfContents headings={headings} />
           </div>
 
-          <div class="prose prose-lg prose-slate max-w-none 
+          <div class="prose prose-slate max-w-none 
               prose-headings:font-serif prose-headings:text-primary prose-headings:font-bold prose-headings:scroll-mt-24
               prose-p:text-text prose-p:leading-loose
               prose-a:text-accent prose-a:no-underline hover:prose-a:underline
@@ -156,10 +156,18 @@ const readTime = Math.ceil((post.body?.length || 0) / 500);
                 立即預約掛號
              </a>
           </div>
+
+          {/* 回到文章列表按鈕 */}
+          <div class="mt-8 flex justify-center">
+             <a href="/blog" class="inline-flex items-center gap-2 px-6 py-2 rounded-full border border-gray-300 text-text/70 hover:bg-gray-100 hover:text-primary transition-all text-sm font-bold">
+               <i class="fa-solid fa-arrow-left"></i>
+               回到文章列表
+             </a>
+          </div>
         </div>
 
         {/* 側邊欄 */}
-        <aside class="hidden lg:block lg:col-span-4 space-y-8">
+        <aside class="hidden lg:block lg:col-span-3 space-y-8">
            <div class="sticky top-32">
              <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
                 <span class="font-serif font-bold text-lg mb-4 flex items-center gap-2 text-primary"><List size={18} className="text-accent" />本文目錄</span>

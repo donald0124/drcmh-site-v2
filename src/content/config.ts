@@ -92,6 +92,9 @@ const settings = defineCollection({
     address: z.string().optional(),
     bookingLink: z.string().url().optional(),
     googleMapEmbedLink: z.string().url().optional(), // [NEW]
+    facebook: z.string().url().optional(),
+    instagram: z.string().url().optional(),
+    line: z.string().url().optional(),
 
   }),
 });

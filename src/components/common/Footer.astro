@@ -6,7 +6,7 @@ const currentYear = new Date().getFullYear();
 
 // 🟢 改用 getEntry 從 Keystatic 讀取全域設定
 const settings = await getEntry('settings', 'global');
-const { doctorName, clinicName, address, phone, sidebarIntro, email } = settings.data;
+const { doctorName, clinicName, address, phone, sidebarIntro, email, facebook, instagram, line } = settings.data;
 
 const clinicInfo = {
   name: clinicName || "新店高美泌尿科診所",
@@ -37,15 +37,39 @@ const clinicInfo = {
         
         {/* 社群連結 */}
         <div class="flex items-center gap-4 pt-2">
-          <a 
-            href="#" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#E4405F] hover:text-white transition-all border border-white/10"
-            title="Instagram"
-          >
-            <i class="fa-brands fa-instagram text-lg"></i>
-          </a>
+          {facebook && (
+            <a 
+              href={facebook} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#1877F2] hover:text-white transition-all border border-white/10"
+              title="Facebook"
+            >
+              <i class="fa-brands fa-facebook text-lg"></i>
+            </a>
+          )}
+          {instagram && (
+            <a 
+              href={instagram} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#E4405F] hover:text-white transition-all border border-white/10"
+              title="Instagram"
+            >
+              <i class="fa-brands fa-instagram text-lg"></i>
+            </a>
+          )}
+          {line && (
+            <a 
+              href={line} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#00C300] hover:text-white transition-all border border-white/10"
+              title="LINE"
+            >
+              <i class="fa-brands fa-line text-lg"></i>
+            </a>
+          )}
         </div>
       </div>
 

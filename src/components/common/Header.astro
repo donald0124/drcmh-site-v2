@@ -11,6 +11,11 @@ const menuItems = [
   { label: '衛教專欄', href: '/blog' },
   { label: '門診資訊', href: '/#clinic' },
 ];
+
+import { getEntry } from 'astro:content';
+const settings = await getEntry('settings', 'global');
+const { facebook, instagram, line } = settings.data;
+const socialLinks = { facebook, instagram, line };
 ---
 
 <!-- Pagefind 從Header搬來 再搬回來 -->
@@ -52,16 +57,24 @@ const menuItems = [
       {/* 搜尋 widget (桌機版會直接顯示 input) */}
       <SearchWidget client:idle />
 
-      {/* Instagram 連結 */}
-      <a 
-        href="#" 
-        target="_blank" 
-        rel="noopener noreferrer"
-        class="text-text/60 hover:text-[#E4405F] transition-colors p-1"
-        title="Instagram"
-      >
-        <i class="fa-brands fa-instagram text-xl"></i>
-      </a>
+      {/* 社群連結 (Desktop) */}
+      <div class="flex items-center gap-3">
+        {facebook && (
+          <a href={facebook} target="_blank" rel="noopener noreferrer" class="text-text/60 hover:text-[#1877F2] transition-colors p-1" title="Facebook">
+            <i class="fa-brands fa-facebook text-xl"></i>
+          </a>
+        )}
+        {instagram && (
+          <a href={instagram} target="_blank" rel="noopener noreferrer" class="text-text/60 hover:text-[#E4405F] transition-colors p-1" title="Instagram">
+            <i class="fa-brands fa-instagram text-xl"></i>
+          </a>
+        )}
+        {line && (
+          <a href={line} target="_blank" rel="noopener noreferrer" class="text-text/60 hover:text-[#00C300] transition-colors p-1" title="LINE">
+            <i class="fa-brands fa-line text-xl"></i>
+          </a>
+        )}
+      </div>
 
       {/* CTA 按鈕 */}
       <a 
@@ -77,7 +90,7 @@ const menuItems = [
       {/* 搜尋 widget (手機版會顯示彈窗) */}
       <SearchModal client:load />
       {/* 漢堡選單 */}
-      <MobileMenu client:media="(max-width: 1024px)" menuItems={menuItems} />
+      <MobileMenu client:media="(max-width: 1024px)" menuItems={menuItems} socialLinks={socialLinks} />
     </div>
 
   </div>

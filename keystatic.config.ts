@@ -74,6 +74,11 @@ export default config({
         bookingLink: fields.url({ label: '線上掛號連結' }),
         googleMapEmbedLink: fields.url({ label: 'Google 地圖嵌入連結' }),
 
+        // --- 5. 社群連結 ---
+        facebook: fields.url({ label: 'Facebook 連結' }),
+        instagram: fields.url({ label: 'Instagram 連結' }),
+        line: fields.url({ label: 'LINE 官方帳號連結' }),
+
 
 
       },

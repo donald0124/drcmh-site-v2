@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { Menu, X, Calendar } from 'lucide-react';
 
 // 🟢 1. 修改這裡：接收 menuItems prop
-const MobileMenu = ({ menuItems }) => {
+const MobileMenu = ({ menuItems, socialLinks }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -103,15 +103,39 @@ const MobileMenu = ({ menuItems }) => {
 
               {/* Social Links */}
               <div className="flex items-center justify-center gap-6 mt-10">
-                <a
-                  href="#"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-text shadow-sm border border-gray-100 transition-all active:scale-95 text-[#E4405F]"
-                  title="Instagram"
-                >
-                  <i className="fa-brands fa-instagram text-2xl"></i>
-                </a>
+                {socialLinks?.facebook && (
+                  <a
+                    href={socialLinks.facebook}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-text shadow-sm border border-gray-100 transition-all active:scale-95 text-[#1877F2]"
+                    title="Facebook"
+                  >
+                    <i className="fa-brands fa-facebook text-2xl"></i>
+                  </a>
+                )}
+                {socialLinks?.instagram && (
+                  <a
+                    href={socialLinks.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-text shadow-sm border border-gray-100 transition-all active:scale-95 text-[#E4405F]"
+                    title="Instagram"
+                  >
+                    <i className="fa-brands fa-instagram text-2xl"></i>
+                  </a>
+                )}
+                {socialLinks?.line && (
+                  <a
+                    href={socialLinks.line}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-text shadow-sm border border-gray-100 transition-all active:scale-95 text-[#00C300]"
+                    title="LINE"
+                  >
+                    <i className="fa-brands fa-line text-2xl"></i>
+                  </a>
+                )}
               </div>
             </nav>
 
