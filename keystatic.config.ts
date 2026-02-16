@@ -4,20 +4,24 @@ export default config({
   // 開發模式使用 local，上線使用 github
   storage: import.meta.env.PROD
     ? {
-      kind: 'github',
-      repo: {
-        owner: 'drchou2026', // 已填上您的 username
-        name: 'drcmh-site-v2', // 已填上您的 repo name
-      },
+      kind: 'cloud',
+      // repo: {
+      //   owner: 'drchou2026', // 已填上您的 username
+      //   name: 'drcmh-site-v2', // 已填上您的 repo name
+      // },
     }
     : {
       kind: 'local',
     },
 
+  cloud: {
+    project: 'drcmh-site-admin/drcmh-site-v2',
+  },
+
   ui: {
     brand: { name: '周孟翰醫師後台' },
     navigation: {
-      '網站內容': ['news', 'blog', 'videos', 'shorts'],
+      '網站內容': ['news', 'blog', 'videos', 'shorts', 'faq'],
       '全站設定': ['schedule', 'resume', 'settings'],
     }
   },
