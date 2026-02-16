@@ -22,8 +22,14 @@ const clinicData = {
 
 // 門診表設定
 const weeklySchedule = scheduleData?.data?.weeklySchedule || [];
+const lastUpdated = scheduleData?.data?.lastUpdated;
 
-// 假如還沒有設定，給預設值 (確保畫面不空)
+// 格式化日期 (YYYY-MM-DD -> YYYY/MM/DD)
+const formattedUpdatedDate = lastUpdated 
+  ? new Date(lastUpdated).toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' })
+  : '';
+
+// 預設門診表 (當 Keystatic 尚未設定時的備分)
 const defaultSchedule = [
   { day: "週一", morning: { status: "看診" }, afternoon: { status: "看診" }, evening: { status: "看診" } },
   { day: "週二", morning: { status: "休診" }, afternoon: { status: "看診" }, evening: { status: "看診" } },
@@ -39,18 +45,18 @@ const displaySchedule = weeklySchedule.length > 0 ? weeklySchedule : defaultSche
 const getStatusLabel = (slot) => {
   if (!slot) return '-';
   if (slot.status === '自訂') return slot.customLabel || '-';
-  if (slot.status === '看診') return '●';
+  if (slot.status === '看診') return '✔'; // 使用 Heavy Check Mark (粗勾勾)
   if (slot.status === '休診') return '-';
-  if (slot.status === '特約診') return '約';
-  if (slot.status === '手術日') return '術';
-  return slot.status; // 若有未預期的狀態，直接顯示
+  if (slot.status === '特約診') return '特約';
+  if (slot.status === '手術日') return '手術';
+  return slot.status;
 };
 
 // 輔助函式：取得樣式
 const getStatusClass = (status) => {
    if (status === '看診') return 'text-accent font-bold bg-accent/10';
    if (status === '休診') return 'text-text/20';
-   if (status === '特約診') return 'text-orange-500 font-bold bg-orange-100';
+   if (status === '特約診') return 'text-red-500 font-bold bg-red-100';
    if (status === '手術日') return 'text-blue-500 font-bold bg-blue-100';
    if (status === '自訂') return 'text-primary font-bold bg-gray-100';
    return 'text-text/20';
@@ -164,7 +170,14 @@ const getStatusClass = (status) => {
              <Clock size={24} />
            </div>
            <div>
-             <h3 class="text-xl font-bold text-primary">門診時刻表</h3>
+             <h3 class="text-xl font-bold text-primary flex items-center gap-3">
+               門診時刻表
+               {formattedUpdatedDate && (
+                 <span class="text-[0.65rem] font-normal bg-accent/10 text-accent px-2 py-0.5 rounded-full border border-accent/20">
+                   更新日期：{formattedUpdatedDate}
+                 </span>
+               )}
+             </h3>
              <p class="text-sm text-text/60">週日休診，國定假日請見公告</p>
            </div>
         </div>

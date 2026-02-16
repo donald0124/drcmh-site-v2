@@ -1,4 +1,4 @@
-lastUpdated: 2026-02-15
+lastUpdated: 2026-02-16
 weeklySchedule:
   - day: 週一
     morning:
@@ -6,14 +6,14 @@ weeklySchedule:
       customLabel: 內湖三總
       note: 0830-1100
     afternoon:
-      status: 休診
+      status: 看診
     evening:
-      status: 特約診
+      status: 休診
   - day: 週二
     morning:
       status: 看診
     afternoon:
-      status: 看診
+      status: 特約診
     evening:
       status: 看診
   - day: 週三
@@ -21,27 +21,27 @@ weeklySchedule:
       status: 自訂
       customLabel: 板橋高美
     afternoon:
-      status: 看診
+      status: 手術日
     evening:
-      status: 看診
+      status: 手術日
   - day: 週四
     morning:
       status: 休診
     afternoon:
-      status: 休診
+      status: 看診
     evening:
-      status: 特約診
+      status: 看診
   - day: 週五
     morning:
-      status: 看診
+      status: 手術日
     afternoon:
-      status: 看診
+      status: 手術日
     evening:
-      status: 看診
+      status: 休診
   - day: 週六
     morning:
-      status: 手術日
+      status: 看診
     afternoon:
-      status: 手術日
+      status: 休診
     evening:
-      status: 手術日
+      status: 休診
