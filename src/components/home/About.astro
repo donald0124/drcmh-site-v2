@@ -1,6 +1,7 @@
 ---
 import { getEntry } from 'astro:content';
 import { GraduationCap, Award, Stethoscope, Building2, CheckCircle2, Quote } from 'lucide-react';
+import Letter from './Letter.astro';
 
 // 🟢 從 Keystatic 讀取全域設定
 const settings = await getEntry('settings', 'global');
@@ -120,64 +121,7 @@ const {
 
     </div>
 
-    {/* 醫師的話 (引用) - 改為大版面呈現 */}
-    <div class="mt-28 py-20 bg-bg rounded-[3rem] relative overflow-hidden fade-in-up">
-      {/* 裝飾背景 (比照 Hero) */}
-      <div class="absolute top-0 right-0 w-2/3 h-full bg-gradient-to-l from-[#F0EBE3] to-transparent z-0 opacity-70"></div>
-      
-      <div class="max-w-4xl mx-auto text-center relative z-10 px-6">
-        <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-white text-accent mb-10 shadow-sm border border-accent/10">
-          <Stethoscope size={28} />
-        </div>
-        
-        <blockquote class="text-sm md:text-2xl font-serif text-primary leading-loose whitespace-pre-wrap mb-10 italic">
-          「{doctorWord || "致力於透過細膩的溝通與精準的治療，協助您卸下心理負擔，重拾自信生活。"}」
-        </blockquote>
-        
-        <div class="flex flex-col items-center gap-5">
-          <div class="w-16 h-1 bg-accent/40 rounded-full"></div>
-          <p class="font-serif font-bold text-primary text-2xl tracking-wider">
-            {doctorName} 醫師 <span class="text-xs font-sans font-normal text-text/60 ml-3 uppercase tracking-widest">Dr. Chou Meng-Han</span>
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- 醫師的話 (引用) - 優化為精緻信函風格 -->
-    <div class="mt-20 relative fade-in-up">
-      <div class="max-w-3xl mx-auto px-6">
-        <div class="bg-white rounded-3xl p-10 md:p-14 shadow-xl border border-highlight relative overflow-hidden group">
-          
-          {/* 裝飾背景：右下角大圖示水印 */}
-          <div class="absolute -bottom-8 -right-8 text-highlight/40 rotate-12 pointer-events-none group-hover:scale-110 transition-transform duration-700">
-            <Stethoscope size={200} />
-          </div>
-
-          <div class="relative z-10">
-            {/* 左上角引號 */}
-            <div class="text-accent/20 mb-6">
-              <Quote size={48} fill="currentColor" />
-            </div>
-            
-            <blockquote class="text-lg md:text-2xl font-serif text-primary leading-relaxed mb-10">
-              {doctorWord || "致力於透過細膩的溝通與精準的治療，協助您卸下心理負擔，重拾自信生活。"}
-            </blockquote>
-            
-            <div class="flex items-center gap-4">
-              <div class="w-12 h-0.5 bg-accent/40"></div>
-              <div>
-                <p class="font-serif font-bold text-primary text-xl">
-                  {doctorName} <span class="text-sm font-sans font-normal text-text/60 ml-1">醫師 / 院長</span>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-
-
+    <Letter/>
 
   </div>
 </section>

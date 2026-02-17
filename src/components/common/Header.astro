@@ -38,7 +38,7 @@ const socialLinks = { facebook, instagram, line };
 
     {/* 2. 桌機版導覽列 + 搜尋 (Desktop Nav) */}
     {/* 使用 lg:flex 隱藏中型平板以下的選單，避免太擠 */}
-    <div class="hidden lg:flex items-center gap-6 xl:gap-8 flex-1 justify-end">
+    <div class="hidden min-[1081px]:flex items-center gap-6 xl:gap-8 flex-1 justify-end">
       <nav class="flex items-center gap-5 xl:gap-7">
         {menuItems.map(item => (
           <a 
@@ -86,7 +86,7 @@ const socialLinks = { facebook, instagram, line };
     </div>
 
     {/* 3. 手機版/平板版 (Mobile/Tablet) */}
-    <div class="flex items-center gap-2 lg:hidden">
+    <div class="flex items-center gap-2 min-[1085px]:hidden">
       {/* 搜尋 widget (手機版會顯示彈窗) */}
       <SearchModal client:load />
       {/* 漢堡選單 */}
