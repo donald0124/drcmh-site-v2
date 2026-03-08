@@ -266,10 +266,11 @@ export default config({
           label: '文章標籤 (Tags)',
           description: '請用「半形逗號」分隔多個標籤。例如：攝護腺, 頻尿, 雷射手術',
         }),
+
         coverImage: fields.image({
           label: '文章預覽卡片封面圖 (選填)',
-          directory: 'src/content/blog/*/',
-          publicPath: './',
+          directory: 'src/content/blog/',
+          publicPath: '.',
           description: '🌟提示：上傳前強烈建議先到 https://squoosh.app/ 壓縮圖片，這會大幅提升網頁載入速度！封面圖片建議 1200x628 像素，比例約 1.91:1，有助於社群分享時顯示效果。',
         }),
 
@@ -287,8 +288,8 @@ export default config({
             divider: true,
             table: true,
             image: {
-              directory: 'src/content/blog/*/',
-              publicPath: './',
+              directory: 'src/content/blog/',
+              publicPath: '.',
               // mdx image 目前在 Keystatic 沒有 description 屬性可以加，所以我們在整個 mdx 的 label / description 加
             }
           }
@@ -301,22 +302,27 @@ export default config({
             label: '自訂 SEO 與摘要 (進階選項)',
             description: '若不勾選，系統將自動抓取文章標題與內文前段作為 SEO 設定。'
           }),
+
           {
+
             // 2. 當勾選 (true) 時顯示的欄位
             true: fields.object({
               excerpt: fields.text({
                 label: '預覽文字',
                 description: '會顯示於文章預覽卡片上。'
               }),
+
               seoTitle: fields.text({
                 label: 'SEO 標題',
                 description: '覆蓋預設的網頁標題。'
               }),
+
               seoDescription: fields.text({
                 label: 'SEO 描述',
                 description: '建議 60-100 字。'
               }),
             }),
+
             // 3. 當沒勾選 (false) 時，裡面是空的 (保持乾淨)
             false: fields.empty(),
           }
