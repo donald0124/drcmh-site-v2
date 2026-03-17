@@ -246,8 +246,8 @@ export default config({
     blog: collection({
       label: '衛教文章管理',
       slugField: 'title',
-      // 👇 關鍵在這裡：使用 * (代表存成一層資料夾結構)
-      path: 'src/content/blog/*/index',
+      // 👇 文章攤平：直接存在 blog 資料夾下
+      path: 'src/content/blog/*',
       format: { contentField: 'content' },
       columns: ['title', 'date'],
       // 🟢 新增這一行：預覽網址設定
@@ -269,8 +269,8 @@ export default config({
 
         coverImage: fields.image({
           label: '文章預覽卡片封面圖 (選填)',
-          directory: 'src/content/blog/',
-          publicPath: '.',
+          directory: 'src/assets/images/blog',
+          publicPath: '../../assets/images/blog/',
           description: '🌟提示：上傳前強烈建議先到 https://squoosh.app/ 壓縮圖片，這會大幅提升網頁載入速度！封面圖片建議 1200x628 像素，比例約 1.91:1，有助於社群分享時顯示效果。',
         }),
 
@@ -288,9 +288,8 @@ export default config({
             divider: true,
             table: true,
             image: {
-              directory: 'src/content/blog/',
-              publicPath: '.',
-              // mdx image 目前在 Keystatic 沒有 description 屬性可以加，所以我們在整個 mdx 的 label / description 加
+              directory: 'src/assets/images/blog',
+              publicPath: '../../assets/images/blog/',
             }
           }
         }),

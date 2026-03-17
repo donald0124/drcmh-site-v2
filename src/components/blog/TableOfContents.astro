@@ -1,30 +1,69 @@
 ---
-import { List } from 'lucide-react';
+import { List, ChevronDown } from 'lucide-react';
 
 interface Props {
   headings: { depth: number; slug: string; text: string }[];
+  className?: string;
+  isMobile?: boolean; // 用來區分手機版或桌機版
 }
 
-const { headings } = Astro.props;
+const { headings, className = "", isMobile = false } = Astro.props;
 
 // 過濾只顯示 H2 和 H3
 const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
 ---
 
 {toc.length > 0 && (
-  <nav class="bg-surface rounded-2xl p-6 border border-gray-100 mb-8">
+  <nav class={`rounded-2xl border border-gray-100 shadow-sm toc-container ${className}`} data-toc>
+    
+    {/* 標題欄 */}
+    <div class={`toc-header flex items-center justify-between ${isMobile ? 'cursor-pointer' : ''}`} data-toggle={isMobile ? 'true' : 'false'}>
+       <span class="font-serif font-bold text-lg flex items-center gap-2 text-primary">
+         <List size={18} className="text-accent" />本文目錄
+       </span>
+       {isMobile && <ChevronDown size={20} className="text-text/50 transition-transform duration-300 toc-icon" />}
+    </div>
 
-    <ul class="space-y-2 text-sm">
-      {toc.map((heading) => (
-        <li class={`${heading.depth === 3 ? 'pl-4' : ''}`}>
-          <a 
-            href={`#${heading.slug}`} 
-            class="text-text hover:text-accent transition-colors block py-1 border-l-2 border-transparent hover:border-accent pl-2 -ml-2"
-          >
-            {heading.text}
-          </a>
-        </li>
-      ))}
-    </ul>
+    {/* 目錄內容 */}
+    <div class={`toc-content overflow-hidden transition-all duration-300 ${isMobile ? 'max-h-0' : 'max-h-[2000px]'}`}>
+      <ul class={`space-y-2 text-sm ${isMobile ? 'pt-4' : 'pt-4'}`}>
+        {toc.map((heading) => (
+          <li class={`${heading.depth === 3 ? 'pl-4' : ''}`}>
+            <a 
+              href={`#${heading.slug}`} 
+              class="text-text hover:text-accent transition-colors block py-1 border-l-2 border-transparent hover:border-accent pl-2 -ml-2"
+            >
+              {heading.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
   </nav>
 )}
+
+<script>
+  // 處理收合展開邏輯
+  document.querySelectorAll('.toc-container').forEach(container => {
+    const header = container.querySelector('[data-toggle="true"]');
+    const content = container.querySelector('.toc-content');
+    const icon = container.querySelector('.toc-icon');
+    
+    if (header && content && icon) {
+      header.addEventListener('click', () => {
+        const isOpen = content.classList.contains('max-h-[2000px]');
+        if (isOpen) {
+          // 關閉
+          content.classList.remove('max-h-[2000px]');
+          content.classList.add('max-h-0');
+          icon.classList.remove('rotate-180');
+        } else {
+          // 展開
+          content.classList.remove('max-h-0');
+          content.classList.add('max-h-[2000px]');
+          icon.classList.add('rotate-180');
+        }
+      });
+    }
+  });
+</script>

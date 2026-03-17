@@ -167,15 +167,7 @@ const readTime = Math.ceil((post.body?.length || 0) / 500);
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
         {/* 主要內容區 */}
         <div class="lg:col-span-8">
-          <div
-            class="lg:hidden mb-8 p-4 bg-surface rounded-xl border border-gray-100 shadow-sm"
-          >
-            <span
-              class="font-serif font-bold text-lg mb-4 flex items-center gap-2 text-primary"
-              ><List size={18} className="text-accent" />本文目錄</span
-            >
-            <TableOfContents headings={headings} />
-          </div>
+          <TableOfContents headings={headings} isMobile={true} className="lg:hidden mb-8 p-4 bg-surface" />
 
           <div
             class="prose prose-slate max-w-none
@@ -222,15 +214,7 @@ const readTime = Math.ceil((post.body?.length || 0) / 500);
         {/* 側邊欄 */}
         <aside class="hidden lg:block lg:col-span-4 space-y-8">
           <div class="sticky top-32">
-            <div
-              class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8"
-            >
-              <span
-                class="font-serif font-bold text-lg mb-4 flex items-center gap-2 text-primary"
-                ><List size={18} className="text-accent" />本文目錄</span
-              >
-              <TableOfContents headings={headings} />
-            </div>
+              <TableOfContents headings={headings} className="bg-white p-6 mb-8" />
             <Sidebar />
           </div>
         </aside>
