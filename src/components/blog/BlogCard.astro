@@ -35,6 +35,7 @@ const advancedData = post.data.advanced?.discriminant ? post.data.advanced.value
 const autoExcerpt = stripMarkdown(post.body).substring(0, 50) + (post.body && post.body.length > 60 ? '...' : '');
 
 const excerpt = advancedData?.excerpt || advancedData?.seoDescription || autoExcerpt || '點擊閱讀全文...';
+const cardExcerpt = excerpt.length > 40 ? `${excerpt.slice(0, 40)}...` : excerpt;
 // 格式化日期
 const formattedDate = post.data.date.toISOString().split('T')[0].replace(/-/g, '.');
 ---
@@ -57,7 +58,7 @@ const formattedDate = post.data.date.toISOString().split('T')[0].replace(/-/g, '
         // 🟢 3. 無圖時的優化：使用漸層標題字卡 (取代原本單調的 icon)
         <div class="w-full h-full flex items-center justify-center p-6 bg-gradient-to-br from-primary/5 via-bg to-accent/10 group-hover:from-primary/10 group-hover:to-accent/20 transition-colors">
            <h3 class="text-xl font-serif font-bold text-primary/80 text-center leading-tight line-clamp-3 group-hover:text-primary">
-             {post.data.title}
+             {cardExcerpt}
            </h3>
         </div>
       )}

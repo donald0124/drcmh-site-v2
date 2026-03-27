@@ -43,27 +43,39 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
 )}
 
 <script>
-  // 處理收合展開邏輯
-  document.querySelectorAll('.toc-container').forEach(container => {
-    const header = container.querySelector('[data-toggle="true"]');
-    const content = container.querySelector('.toc-content');
-    const icon = container.querySelector('.toc-icon');
-    
-    if (header && content && icon) {
+  // 處理收合展開邏輯（支援首次載入與 Astro 頁面切換）
+  const initTocAccordion = () => {
+    document.querySelectorAll<HTMLElement>('.toc-container').forEach((container) => {
+      const header = container.querySelector<HTMLElement>('[data-toggle="true"]');
+      const content = container.querySelector<HTMLElement>('.toc-content');
+      const icon = container.querySelector<HTMLElement>('.toc-icon');
+
+      if (!header || !content || !icon) return;
+      if (header.dataset.tocBound === 'true') return;
+
+      header.dataset.tocBound = 'true';
+
       header.addEventListener('click', () => {
         const isOpen = content.classList.contains('max-h-[2000px]');
+
         if (isOpen) {
-          // 關閉
           content.classList.remove('max-h-[2000px]');
           content.classList.add('max-h-0');
           icon.classList.remove('rotate-180');
         } else {
-          // 展開
           content.classList.remove('max-h-0');
           content.classList.add('max-h-[2000px]');
           icon.classList.add('rotate-180');
         }
       });
-    }
-  });
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTocAccordion, { once: true });
+  } else {
+    initTocAccordion();
+  }
+
+  document.addEventListener('astro:page-load', initTocAccordion);
 </script>

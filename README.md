@@ -1,46 +1,91 @@
-# Astro Starter Kit: Basics
+# DrChou 官網維運使用指南
 
-```sh
-npm create astro@latest -- --template basics
-```
+周醫師您好，以下為您整理專屬的網站架構說明與「管理後台」操作指南。這份指南去除了複雜的開發術語，讓您可以輕鬆了解網站全貌，並自主管理診所的網站內容。
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+---
 
-## 🚀 Project Structure
+## 一、 網站整體架構總覽
 
-Inside of your Astro project, you'll see the following folders and files:
+您的網站主要分為「前台展示」與「管理後台」兩大區塊。您可以想像這是一家線上的數位診所，有些裝潢是固定的，有些佈告欄則是您可以隨時替換的。
 
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
-```
+### 1. 前台展示（病患看到的網站）
+* **首頁 (Home)：** 網站門面，包含醫師介紹、主治專長、門診時刻表，以及最新消息與衛教文章的快速輪播。
+* **衛教文章 (Blog)：** 專屬的醫療知識庫，提供民眾衛教知識。
+* **最新消息 (News)：** 診所休診公告、活動資訊或網站更新動態。
+* **影音專區 (Videos & Shorts)：** 收錄您的衛教長影片與短影音（連結至 YouTube 等平台）。
+* **常見問答 (FAQ)：** 整理病患最常詢問的問題（如就診須知、自費項目疑問等）。
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+### 2. 管理後台（您登入後操作的地方）
+* **網站內容：** 日常發布管理（文章、消息、影片、短影音、FAQ）。
+* **全站設定：** 固定資訊維護（診所基本資料、醫師履歷、門診時刻表）。
 
-## 🧞 Commands
+---
 
-All commands are run from the root of the project, from a terminal:
+## 二、 如何登入「管理後台」
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+您可以透過以下兩種方式進入專屬的內容管理系統：
+1. **直接輸入網址：** 在官網網址後加上 `/admin`，系統會自動導向後台入口。
+2. **頁尾暗連結：** 網站最下方的 **頁尾 (Footer)** 區塊設有隱藏暗連結，滑鼠點擊即最下面 `Dr. Chou Meng-Han` 可進入。
 
-## 👀 Want to learn more?
+*(進入後依照畫面提示，使用您的授權帳號登入即可開始操作。)*
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+---
+
+## 三、 管理後台操作與發布流程
+
+進入後台後，最常使用的是「網站內容」區塊。以下以「新增衛教文章」為例，說明標準發布流程：
+
+### Step by Step 單篇文章發布流程
+1. **開始新增：** 點擊「衛教文章」 👉 選擇「新增」或編輯既有文章。
+2. **填寫基本資料（必填）：**
+   * **文章標題：** 請填寫吸引人且清楚的標題。
+   * **網址代稱 (Slug)：** 專屬的英文/數字網址列（例如：`hpv-vaccine`）。
+   * **發布日期：** 選擇今天或希望顯示的日期。
+   * **編輯內文：** 像使用 Word 一樣直接輸入內容、設定段落標題與清單。
+3. **填寫進階/SEO資料（強烈建議）：**
+   * **上傳封面圖：** 建議尺寸約 1200×628，能增加點閱意願。
+   * **標籤 (Tags)：** 輸入關鍵字，用半形逗號分隔（例如：攝護腺肥大, 頻尿）。
+   * **摘要 (Excerpt)：** 一句話簡述文章重點，會顯示在文章列表的預覽中。
+   * **SEO 設定：** 填妥 SEO 標題與描述，有助於 Google 搜尋排名。
+4. **預覽與發布：** 點擊「儲存 (Save)」後先預覽排版，確認無誤即可發布上線。
+
+### 💡 關於內容排列順序的調整
+* **文章 / 消息列表：** 系統以「發布日期」排序。想往前顯示就把日期調新，想往後就調舊。
+* **FAQ / 短影音：** 以系統後台的排序欄位為主。若無欄位或需調整首頁模組區塊順序，請交由開發端處理。
+
+---
+
+## 四、 發布前的重要規範與品質檢查（⭐ 務必留意）
+
+由於醫療內容具備高度專業性與法規限制，發布前請務必確認以下規範：
+
+### 1. 醫療廣告與法規提醒
+* **避免保證療效：** 請勿使用「保證治癒」、「100% 有效」、「全國第一」等絕對化用語，也不要使用未經證實的誇大數據。
+* **保護病患隱私：** 若分享案例，照片與內文必須「完全去識別化」，不可露出可辨識的特徵或病歷資料。
+* **加註警語與風險：** 提及任何治療方式，應附上風險與適應症說明，並建議在頁面底部加上免責聲明（例如：「本資訊僅為衛教目的，實際治療需由醫師親自當面評估。」）。
+*(註：本指南屬網站維運建議，法規細節請以法遵或法律顧問意見為準。)*
+
+### 2. 🚨 重大警告：絕對不要隨意更改已發布文章的網址代稱 (Slug)
+* **原因：** 文章網址是由 Slug 產生，一旦發布後再做更改，舊連結會立刻失效（變成 404 錯誤），這會導致別人分享的連結打不開，也會嚴重影響 Google 搜尋紀錄與社群宣傳素材。
+* **正確做法：** 發布後原則上不改。若非改不可，需請開發端同步設定 301 轉址。
+
+### 3. 圖片上傳注意事項（關乎網站速度）
+* **先壓縮再上傳：** 檔案過大會導致網站變慢。單張圖片大小請盡量壓縮在 **300KB** 以內。
+* **格式建議：** 照片類型的圖檔請優先存成 **JPG** 格式。
+* **實用工具：** 建議使用 Google 免費工具 **[Squoosh](https://squoosh.app/)** 進行圖檔壓縮。
+
+---
+
+## 五、 發布前檢查清單
+
+送出文章前，請利用此清單做最後確認：
+
+- [ ] 標題正確、無錯字
+- [ ] 網址代稱 (Slug) 設定正確且不再更動
+- [ ] 圖片與封面圖已壓縮至 300KB 內（JPG 格式）
+- [ ] 摘要 (Excerpt) 與 SEO 欄位已填寫
+- [ ] 內文無醫療廣告高風險或觸法文字
+- [ ] （發布後）手機版閱讀排版正常
+
+> **💡 給醫師的日常維運檢查小口訣：**
+> **「圖有壓小、標題無誤、網址不亂改、摘要有寫、文字合法規」**，確認沒問題就可以安心發布囉！
