@@ -115,12 +115,6 @@ export default config({
       label: '門診時刻表',
       path: 'src/content/schedule/timetable',
       schema: {
-        image: fields.image({
-          label: '門診表圖片',
-          description: '請上傳最新的門診時間表圖片',
-          directory: 'public/images/schedule',
-          publicPath: '/images/schedule/',
-        }),
         lastUpdated: fields.date({ label: '更新日期', defaultValue: { kind: 'today' } }),
         note: fields.text({ label: '備註文字', description: '例如：國定假日看診異動說明' }),
 
@@ -241,7 +235,7 @@ export default config({
           }),
           {
             label: '短影音列表',
-            itemLabel: props => props.fields.title.value || '新增短影音',
+            itemLabel: props => `${props.fields.title.value || '未命名'} - ${props.fields.date.value || ''}`,
           }
         ),
       },
@@ -252,8 +246,8 @@ export default config({
     blog: collection({
       label: '衛教文章管理',
       slugField: 'title',
-      // 👇 關鍵在這裡：使用 ** (代表存成資料夾結構)
-      path: 'src/content/blog/**/index',
+      // 👇 文章攤平：直接存在 blog 資料夾下
+      path: 'src/content/blog/*',
       format: { contentField: 'content' },
       columns: ['title', 'date'],
       // 🟢 新增這一行：預覽網址設定
@@ -262,25 +256,27 @@ export default config({
       schema: {
         title: fields.slug({
           name: { label: '文章標題 (Title)', description: '顯示在網站上的大標題' },
-          slug: { label: '網址代稱 (Slug)', description: '網址的最後一部分 (建議使用英文，例如: prostate-treatment)，這會影響 SEO 且發布後不建議修改。' }
+          slug: { label: '網址代稱 (Slug) 🚨警告：此為網址結構，發布後修改會導致舊網址失效！', description: '網址的最後一部分 (建議使用英文，例如: prostate-treatment)。⚠️強烈建議發布後不要修改！如果要修改請務必確認。' }
         }),
 
-        date: fields.date({ label: '發布日期' }),
+        date: fields.date({ label: '發布日期', defaultValue: { kind: 'today' } }),
         author: fields.text({ label: '作者', defaultValue: '周孟翰 醫師', }),
         // 🟢 改成這樣：
         tags: fields.text({
           label: '文章標籤 (Tags)',
           description: '請用「半形逗號」分隔多個標籤。例如：攝護腺, 頻尿, 雷射手術',
         }),
+
         coverImage: fields.image({
-          label: '文章封面圖',
+          label: '文章預覽卡片封面圖 (選填)',
           directory: 'src/assets/images/blog',
-          publicPath: '../../../assets/images/blog/',
-          description: '上傳需要一點時間。封面圖片，建議 1200x628 像素，比例約 1.91:1，有助於社群分享時顯示效果。',
+          publicPath: '../../assets/images/blog/',
+          description: '🌟提示：上傳前強烈建議先到 https://squoosh.app/ 壓縮圖片，這會大幅提升網頁載入速度！封面圖片建議 1200x628 像素，比例約 1.91:1，有助於社群分享時顯示效果。',
         }),
 
         content: fields.mdx({
           label: '文章內文',
+          description: '🌟提示：若要在內文插入圖片，強烈建議先到 https://squoosh.app/ 壓縮後再上傳，確保網頁載入流暢！',
           options: {
             bold: true,
             italic: true,
@@ -292,8 +288,8 @@ export default config({
             divider: true,
             table: true,
             image: {
-              directory: 'src/content/blog',
-              publicPath: '../../../content/blog/',
+              directory: 'src/assets/images/blog',
+              publicPath: '../../assets/images/blog/',
             }
           }
         }),
@@ -305,22 +301,27 @@ export default config({
             label: '自訂 SEO 與摘要 (進階選項)',
             description: '若不勾選，系統將自動抓取文章標題與內文前段作為 SEO 設定。'
           }),
+
           {
+
             // 2. 當勾選 (true) 時顯示的欄位
             true: fields.object({
               excerpt: fields.text({
                 label: '預覽文字',
                 description: '會顯示於文章預覽卡片上。'
               }),
+
               seoTitle: fields.text({
                 label: 'SEO 標題',
                 description: '覆蓋預設的網頁標題。'
               }),
+
               seoDescription: fields.text({
                 label: 'SEO 描述',
                 description: '建議 60-100 字。'
               }),
             }),
+
             // 3. 當沒勾選 (false) 時，裡面是空的 (保持乾淨)
             false: fields.empty(),
           }
@@ -335,10 +336,11 @@ export default config({
       slugField: 'title',
       path: 'src/content/news/*',
       format: { contentField: 'content' },
+      columns: ['title', 'date'],
       schema: {
         title: fields.slug({
           name: { label: '公告標題' },
-          slug: { label: '網址代稱 (Slug)', description: '建議使用日期開頭，如 2026-02-04-holiday' }
+          slug: { label: '網址代稱 (Slug)', description: '建議使用日期開頭，如 2026-02-04-holiday。⚠️建議發布後不要修改。' }
         }),
         date: fields.date({ label: '發布日期', defaultValue: { kind: 'today' } }),
 
@@ -392,6 +394,7 @@ export default config({
       label: '衛教影片管理 (橫式)',
       slugField: 'title',
       path: 'src/content/videos/*',
+      columns: ['title', 'date'],
       schema: {
         title: fields.slug({ name: { label: '影片標題' } }),
         date: fields.date({ label: '發布日期', defaultValue: { kind: 'today' } }),

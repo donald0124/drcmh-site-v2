@@ -9,6 +9,9 @@
     @apply font-sans text-text bg-bg;
 
   }
+}
+
+@layer base {
 
   h1,
   h2,

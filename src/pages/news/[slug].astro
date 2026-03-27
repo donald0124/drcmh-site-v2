@@ -136,10 +136,10 @@ const currentCat = categoryStyles[post.data.category] || { label: '公告', clas
             <a href={`/news/${item.id}`} class="group bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-xl hover:border-primary/20 transition-all duration-300">
               <div class="flex flex-col gap-4">
                 <div class="flex items-center gap-3">
-                  <span class={`px-2 py-0.5 rounded text-[10px] font-bold border ${categoryStyles[item.data.category]?.class || ''}`}>
+                  <span class={`px-2 py-0.5 rounded text-xs font-bold border ${categoryStyles[item.data.category]?.class || ''}`}>
                     {categoryStyles[item.data.category]?.label || '公告'}
                   </span>
-                  <span class="text-[10px] text-gray-400 font-medium">{formatDate(item.data.date)}</span>
+                  <span class="text-xs text-gray-400 font-medium">{formatDate(item.data.date)}</span>
                 </div>
                 <h3 class="font-bold text-gray-800 leading-snug line-clamp-2 group-hover:text-primary transition-colors">
                   {item.data.title}

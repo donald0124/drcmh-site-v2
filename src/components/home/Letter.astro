@@ -1,0 +1,73 @@
+---
+import { getEntry } from 'astro:content';
+import { Stethoscope } from 'lucide-react';
+
+// 1. 取得資料
+const settings = await getEntry('settings', 'global');
+const { doctorWord, doctorName } = settings.data;
+
+// 2. 處理文字邏輯
+// 設定預設文字 (萬一後台沒填寫時顯示)
+const defaultText = `許多人遲疑地走進泌尿科，是因為不好意思、擔心，或不確定這樣的問題是否需要就醫。
+多年在醫學中心與臨床第一線的訓練與看診經驗，讓我深刻體會到，泌尿科的困擾不只是身體的不適，更常影響一個人的自信、尊嚴與生活品質。因此，我重視傾聽與清楚說明，陪您一起找出真正適合您的治療方式。
+希望這裡不只是一間看病的診所，而是一個能讓您安心談論任何難以啟齒問題的地方。我會以專業為基礎、以理解為出發點，陪您一起守護下半身的健康與長遠的生活品質。`;
+
+// 使用後台資料，如果沒有則使用預設值
+const rawText = doctorWord || defaultText;
+
+// 關鍵步驟：將長文字依照「換行符號」切分成陣列，並過濾掉空行
+const paragraphs = rawText.split('\n').filter(line => line.trim() !== '');
+---
+
+<section class="py-24 px-6 bg-white relative overflow-hidden">
+  {/* 背景裝飾：超大的淡淡浮水印 */}
+  <div class="absolute top-0 right-0 text-gray-50 opacity-[0.03] pointer-events-none">
+     <Stethoscope size={600} strokeWidth={0.5} />
+  </div>
+
+  <div class="max-w-3xl mx-auto relative z-10">
+    <div class="text-center mb-12">
+        <h3 class="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-3">Doctor's Note</h3>
+        <h2 class="text-3xl md:text-4xl font-serif font-bold text-primary">醫師的話</h2>
+        <div class="w-16 h-1 bg-accent mx-auto mt-6"></div>
+    </div>
+
+    {/* 信件內容區塊 */}
+    <div class="relative">
+        {/* 左側邊線裝飾 */}
+        <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-accent/0 via-accent/50 to-accent/0 md:block hidden"></div>
+
+        <div class="pl-0 md:pl-10 text-lg md:text-xl text-text/80 leading-loose font-sans">
+            
+            {/* 🟢 動態渲染段落 */}
+            {paragraphs.map((paragraph, index) => {
+                // 設計邏輯：如果是第 2 段 (index === 1)，給它特殊的強調樣式
+                const isHighlight = index === 1; 
+
+                return (
+                    <p class:list={[
+                        "mb-8", // 預設間距
+                        { 
+                          // 如果是第二段，字變深色、加粗一點
+                          "text-primary font-medium": isHighlight,
+                          // 其他段落維持原本樣式
+                          "": !isHighlight 
+                        }
+                    ]}>
+                        {paragraph}
+                    </p>
+                )
+            })}
+
+        </div>
+    </div>
+
+    <div class="mt-16 flex justify-end items-center gap-4">
+        <div class="w-12 h-0.5 bg-accent/40 rounded-full"></div>
+        <div="text-right">
+            <p class="font-serif text-2xl text-primary font-bold">周孟翰 醫師</p>
+            <p class="text-sm text-gray-400 mt-1">Dr. Chou Meng-Han</p>
+        </div>
+    </div>
+  </div>
+</section>

@@ -1,25 +1,25 @@
 ---
 export const prerender = true;
-import { getCollection, render } from 'astro:content';
-import Layout from '../../layouts/Layout.astro';
-import Header from '../../components/common/Header.astro';
-import Footer from '../../components/common/Footer.astro';
-import Sidebar from '../../components/blog/Sidebar.astro';
-import TableOfContents from '../../components/blog/TableOfContents.astro';
-import BlogCard from '../../components/blog/BlogCard.astro';
-import { Image } from 'astro:assets';
-import { Calendar, User, Clock, List } from 'lucide-react';
+import { getCollection, render } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/common/Header.astro";
+import Footer from "../../components/common/Footer.astro";
+import Sidebar from "../../components/blog/Sidebar.astro";
+import TableOfContents from "../../components/blog/TableOfContents.astro";
+import BlogCard from "../../components/blog/BlogCard.astro";
+import { Image } from "astro:assets";
+import { Calendar, User, Clock, List } from "lucide-react";
 
 // 1. 生成靜態路徑 (Static Paths)
 export async function getStaticPaths() {
-  const posts = await getCollection('blog');
+  const posts = await getCollection("blog");
   return posts.map((post) => {
     // 🟢 修正 1：移除副檔名 (.mdoc 或 .md)
     // 這樣網址才會是乾淨的 /blog/title，而不是 /blog/title.mdoc
-    const cleanSlug = post.id.replace(/\.(mdoc|md|yaml|json)$/, '');
-    
+    const cleanSlug = post.id.replace(/\.(mdoc|md|yaml|json)$/, "");
+
     return {
-      params: { slug: cleanSlug }, 
+      params: { slug: cleanSlug },
       props: { post },
     };
   });
@@ -29,7 +29,11 @@ const { post } = Astro.props;
 const { Content, headings } = await render(post);
 
 // --- 🟢 修正 2：更安全的資料讀取 (防止舊文章報錯) ---
-let advancedData: { excerpt?: string; seoTitle?: string; seoDescription?: string } = {};
+let advancedData: {
+  excerpt?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+} = {};
 
 // 使用 ?. 確保即使 advanced 是 undefined 也不會當機
 if (post.data.advanced?.discriminant) {
@@ -38,164 +42,202 @@ if (post.data.advanced?.discriminant) {
 
 // 決定 SEO 資訊
 const seoTitle = advancedData.seoTitle || `${post.data.title} | 周孟翰醫師`;
-const seoDescription = advancedData.seoDescription || advancedData.excerpt || `周孟翰醫師衛教文章：${post.data.title}`; 
+const seoDescription =
+  advancedData.seoDescription ||
+  advancedData.excerpt ||
+  `周孟翰醫師衛教文章：${post.data.title}`;
 // ------------------------------------------------
 
 // 獲取相關文章邏輯
-const allPosts = await getCollection('blog');
+const allPosts = await getCollection("blog");
 const relatedPosts = allPosts
   .filter((p) => p.id !== post.id)
   .map((p) => {
     // 確保 tags 存在才 filter (防呆)
-    const pTags = p.data.tags || [];
-    const currentTags = post.data.tags || [];
-    const intersection = pTags.filter((tag) => currentTags.includes(tag));
+    const pTags: string[] = Array.isArray(p.data.tags)
+      ? p.data.tags
+      : typeof p.data.tags === "string"
+        ? (p.data.tags as string).split(",").map((t: string) => t.trim())
+        : [];
+    const currentTags: string[] = Array.isArray(post.data.tags)
+      ? post.data.tags
+      : typeof post.data.tags === "string"
+        ? (post.data.tags as string).split(",").map((t: string) => t.trim())
+        : [];
+    const intersection = pTags.filter((tag: string) =>
+      currentTags.includes(tag),
+    );
     return { ...p, score: intersection.length };
   })
   .filter((p) => p.score > 0)
-  .sort((a, b) => b.score - a.score || b.data.date.valueOf() - a.data.date.valueOf())
+  .sort(
+    (a, b) =>
+      b.score - a.score || b.data.date.valueOf() - a.data.date.valueOf(),
+  )
   .slice(0, 3);
 
-const formattedDate = post.data.date.toISOString().split('T')[0].replace(/-/g, '.');
+const formattedDate = post.data.date
+  .toISOString()
+  .split("T")[0]
+  .replace(/-/g, ".");
 const readTime = Math.ceil((post.body?.length || 0) / 500);
 ---
 
-<Layout 
+<Layout
   title={seoTitle}
-  description={seoDescription} 
+  description={seoDescription}
   image={post.data.coverImage?.src}
 >
   <Header slot="header" />
 
   {/* Progress Bar */}
-  <div class="fixed top-0 left-0 w-full h-1 bg-transparent z-50 pointer-events-none">
-    <div class="h-full bg-accent w-0 transition-all duration-150 ease-out" id="progress-bar"></div>
+  <div
+    class="fixed top-0 left-0 w-full h-1 bg-transparent z-50 pointer-events-none"
+  >
+    <div
+      class="h-full bg-accent w-0 transition-all duration-150 ease-out"
+      id="progress-bar"
+    >
+    </div>
   </div>
 
   <article class="pt-8 md:pt-8 pb-16 bg-bg min-h-screen">
-    
     {/* 1. 文章 Header (Hero) */}
     <header class="container mx-auto px-6 mb-6 max-w-5xl">
-      <div class="flex items-center gap-2 text-sm text-text/60 mb-6 flex-wrap">
+      <div class="flex items-center gap-2 text-xs text-text/60 mb-6 whitespace-nowrap overflow-hidden">
         <a href="/" class="hover:text-primary transition-colors">首頁</a>
         <span>/</span>
-        <a href="/blog" class="hover:text-primary transition-colors">衛教專欄</a>
+        <a href="/blog" class="hover:text-primary transition-colors">衛教專欄</a
+        >
         <span>/</span>
-        <span class="text-accent truncate max-w-[200px]">{post.data.title}</span>
+        <span class="text-accent truncate min-w-0 max-w-[170px] sm:max-w-[260px]">{post.data.title}</span
+        >
       </div>
 
       <div class="flex flex-col gap-6">
-        {post.data.tags && post.data.tags.length > 0 && (
-          <div class="flex flex-wrap gap-2">
-             {post.data.tags.map(tag => (
-               <a href={`/blog?tag=${tag}`} class="bg-white px-3 py-1 rounded-full text-xs font-bold text-accent shadow-sm border border-accent/20 hover:bg-accent hover:text-white transition-colors">
-                 #{tag}
-               </a>
-             ))}
-          </div>
-        )}
+        {
+          post.data.tags && (
+            <div class="flex flex-wrap gap-2">
+              {(Array.isArray(post.data.tags)
+                ? post.data.tags
+                : typeof post.data.tags === "string"
+                  ? (post.data.tags as string)
+                      .split(",")
+                      .map((t: string) => t.trim())
+                  : []
+              ).map((tag: string) => (
+                <a
+                  href={`/blog?tag=${tag}`}
+                  class="bg-white px-3 py-1 rounded-full text-xs font-bold text-accent shadow-sm border border-accent/20 hover:bg-accent hover:text-white transition-colors"
+                >
+                  #{tag}
+                </a>
+              ))}
+            </div>
+          )
+        }
 
-        <h1 class="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-primary leading-tight" data-pagefind-weight="10">
+        <h1
+          class="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-primary leading-tight"
+          data-pagefind-weight="10"
+        >
           {post.data.title}
         </h1>
 
-        <div class="flex items-center gap-6 text-sm text-text/70 border-b border-primary/10 pb-6 flex-wrap">
-           <div class="flex items-center gap-2">
-             <Calendar size={16} />
-             <span>{formattedDate}</span>
-           </div>
-           <div class="flex items-center gap-2">
-             <User size={16} />
-             <span>{post.data.author || '周孟翰 醫師'}</span>
-           </div>
-           <div class="flex items-center gap-2">
-             <Clock size={16} />
-             <span>約 {readTime} 分鐘閱讀</span> 
-           </div>
+        <div
+          class="flex items-center gap-6 text-sm text-text/70 border-b border-primary/10 pb-6 flex-wrap"
+        >
+          <div class="flex items-center gap-2">
+            <Calendar size={16} />
+            <span>{formattedDate}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <User size={16} />
+            <span>{post.data.author || "周孟翰 醫師"}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <Clock size={16} />
+            <span>約 {readTime} 分鐘閱讀</span>
+          </div>
         </div>
       </div>
     </header>
 
-    <div class="container mx-auto px-6 max-w-6xl">
+    <div class="container mx-auto px-4 max-w-6xl">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
-        
         {/* 主要內容區 */}
-        <div class="lg:col-span-8">
-          {post.data.coverImage && (
-            <div class="rounded-2xl overflow-hidden shadow-lg mb-10 aspect-video bg-gray-200">
-               <Image 
-                 src={post.data.coverImage} 
-                 alt={post.data.title}
-                 class="w-full h-full object-cover"
-                 loading="eager"
-               />
-            </div>
-          )}
+        <div class="lg:col-span-9">
+          <TableOfContents headings={headings} isMobile={true} className="lg:hidden mb-8 p-4 bg-surface" />
 
-          <div class="lg:hidden mb-8 p-4 bg-surface rounded-xl border border-gray-100 shadow-sm">
-             <span class="font-serif font-bold text-lg mb-4 flex items-center gap-2 text-primary"><List size={18} className="text-accent" />本文目錄</span>
-             <TableOfContents headings={headings} />
-          </div>
-
-          <div class="prose prose-slate max-w-none 
+          <div
+            class="prose prose-slate max-w-none
               prose-headings:font-serif prose-headings:text-primary prose-headings:font-bold prose-headings:scroll-mt-24
               prose-p:text-text prose-p:leading-loose
               prose-a:text-accent prose-a:no-underline hover:prose-a:underline
-              prose-blockquote:border-accent prose-blockquote:bg-surface prose-blockquote:py-2 prose-blockquote:px-6 prose-blockquote:not-italic prose-blockquote:rounded-r-lg
+              prose-blockquote:border-accent prose-blockquote:bg-surface prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:not-italic prose-blockquote:rounded-r-lg
               prose-li:marker:text-accent
               prose-img:rounded-xl prose-img:shadow-md
-              bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-transparent"
+              bg-white p-4 md:p-6 rounded-3xl shadow-sm border border-transparent"
           >
-             <Content />
+            <Content />
           </div>
 
-          <div class="mt-12 p-8 bg-highlight-gold/30 rounded-2xl border border-accent/20 text-center">
-             <h3 class="text-xl font-serif font-bold text-primary mb-2">還有其他疑問嗎？</h3>
-             <p class="text-text mb-6">每個人的狀況都不盡相同，歡迎來到診間，讓我為您做詳細的檢查與評估。</p>
-             <a href="/#clinic" class="inline-flex items-center gap-2 px-8 py-3 bg-primary text-white font-bold rounded-full hover:bg-accent transition-colors shadow-lg hover:-translate-y-1">
-                立即預約掛號
-             </a>
+          <div
+            class="mt-12 p-8 bg-highlight-gold/30 rounded-2xl border border-accent/20 text-center"
+          >
+            <h3 class="text-xl font-serif font-bold text-primary mb-2">
+              還有其他疑問嗎？
+            </h3>
+            <p class="text-text mb-6">
+              每個人的狀況都不盡相同，歡迎來到診間，讓我為您做詳細的檢查與評估。
+            </p>
+            <a
+              href="/#clinic"
+              class="inline-flex items-center gap-2 px-8 py-3 bg-primary text-white font-bold rounded-full hover:bg-accent transition-colors shadow-lg hover:-translate-y-1"
+            >
+              立即預約掛號
+            </a>
           </div>
 
           {/* 回到文章列表按鈕 */}
           <div class="mt-8 flex justify-center">
-             <a href="/blog" class="inline-flex items-center gap-2 px-6 py-2 rounded-full border border-gray-300 text-text/70 hover:bg-gray-100 hover:text-primary transition-all text-sm font-bold">
-               <i class="fa-solid fa-arrow-left"></i>
-               回到文章列表
-             </a>
+            <a
+              href="/blog"
+              class="inline-flex items-center gap-2 px-6 py-2 rounded-full border border-gray-300 text-text/70 hover:bg-gray-100 hover:text-primary transition-all text-sm font-bold"
+            >
+              <i class="fa-solid fa-arrow-left"></i>
+              回到文章列表
+            </a>
           </div>
         </div>
 
         {/* 側邊欄 */}
-        <aside class="hidden lg:block lg:col-span-4 space-y-8">
-           <div class="sticky top-32">
-             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
-                <span class="font-serif font-bold text-lg mb-4 flex items-center gap-2 text-primary"><List size={18} className="text-accent" />本文目錄</span>
-                <TableOfContents headings={headings} />
-             </div>
-             <Sidebar />
-           </div>
+          <aside class="hidden lg:block lg:col-span-3 space-y-8">
+          <div class="sticky top-32">
+              <TableOfContents headings={headings} className="bg-white p-6 mb-8" />
+            <Sidebar />
+          </div>
         </aside>
-
       </div>
     </div>
-    
-    {relatedPosts.length > 0 && (
-      <section class="mt-24 pt-16 border-t border-gray-200 bg-surface">
-         <div class="container mx-auto px-6 max-w-6xl">
+
+    {
+      relatedPosts.length > 0 && (
+        <section class="mt-24 pt-16 border-t border-gray-200 bg-surface">
+          <div class="container mx-auto px-6 max-w-6xl">
             <h2 class="text-2xl font-serif font-bold text-primary mb-8 flex items-center gap-3">
-              <div class="w-1 h-8 bg-accent rounded-full"></div>
+              <div class="w-1 h-8 bg-accent rounded-full" />
               延伸閱讀
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-               {relatedPosts.map(p => (
-                 <BlogCard post={p} />
-               ))}
+              {relatedPosts.map((p) => (
+                <BlogCard post={p} />
+              ))}
             </div>
-         </div>
-      </section>
-    )}
-
+          </div>
+        </section>
+      )
+    }
   </article>
 
   <Footer slot="footer" />
@@ -203,14 +245,17 @@ const readTime = Math.ceil((post.body?.length || 0) / 500);
 
 <script>
   function updateProgress() {
-    const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const winScroll =
+      document.body.scrollTop || document.documentElement.scrollTop;
+    const height =
+      document.documentElement.scrollHeight -
+      document.documentElement.clientHeight;
     const scrolled = (winScroll / height) * 100;
     const progressBar = document.getElementById("progress-bar");
     if (progressBar) {
       progressBar.style.width = scrolled + "%";
     }
   }
-  window.addEventListener('scroll', updateProgress);
-  window.addEventListener('load', updateProgress);
+  window.addEventListener("scroll", updateProgress);
+  window.addEventListener("load", updateProgress);
 </script>

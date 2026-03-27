@@ -1,6 +1,7 @@
 ---
-import { Calendar, Tag, ArrowRight } from 'lucide-react';
+import { Calendar, ArrowRight } from 'lucide-react';
 import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
 interface Props {
@@ -8,6 +9,10 @@ interface Props {
 }
 
 const { post } = Astro.props;
+const blogImageModules = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/images/blog/**/*.{avif,gif,jpeg,jpg,png,webp}',
+  { eager: true }
+);
 
 // 🟢 1. 修復連結：處理 Astro v5 glob loader 的 ID
 const slug = post.id.replace(/\.(mdoc|md|yaml|json)$/, '');
@@ -27,14 +32,65 @@ function stripMarkdown(markdown: string | undefined) {
     .trim();
 }
 
+// 從文章內容中抓第一張圖（支援 Markdown 與 HTML img）
+function getFirstImageFromBody(markdown: string | undefined) {
+  if (!markdown) return null;
+
+  // Markdown 圖片語法：![alt](url)
+  const markdownImageMatch = markdown.match(/!\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/);
+  if (markdownImageMatch?.[1]) return markdownImageMatch[1];
+
+
+  
+  // HTML 圖片語法：<img src="..."> 或 <img src='...'>
+  const htmlImageMatch = markdown.match(/<img[^>]+src=["']([^"']+)["'][^>]*>/i);
+  if (htmlImageMatch?.[1]) return htmlImageMatch[1];
+
+  return null;
+}
+
+function normalizeBodyImagePath(imagePath: string) {
+  const decodedPath = decodeURIComponent(imagePath.trim());
+
+  if (decodedPath.startsWith('../../assets/')) {
+    return `/src/assets/${decodedPath.slice('../../assets/'.length)}`;
+  }
+
+  if (decodedPath.startsWith('/src/assets/')) {
+    return decodedPath;
+  }
+
+  if (decodedPath.startsWith('src/assets/')) {
+    return `/${decodedPath}`;
+  }
+
+  return decodedPath;
+}
+
+function resolveBodyImage(imagePath: string | null) {
+  if (!imagePath) return null;
+
+  const normalizedPath = normalizeBodyImagePath(imagePath);
+  const assetModule = blogImageModules[normalizedPath];
+
+  if (assetModule?.default) {
+    return { asset: assetModule.default, url: null };
+  }
+
+  return { asset: null, url: normalizedPath };
+}
+
 // 🟢 3. 邏輯升級：
 // 優先順序：手動摘要 > SEO 描述 > 自動抓前 60 字 > 預設文字
 const advancedData = post.data.advanced?.discriminant ? post.data.advanced.value : null;
 
 // 自動產生摘要 (從 body 抓取，如果 body 是空的就給空字串)
 const autoExcerpt = stripMarkdown(post.body).substring(0, 50) + (post.body && post.body.length > 60 ? '...' : '');
+const firstBodyImage = getFirstImageFromBody(post.body);
+const resolvedBodyImage = resolveBodyImage(firstBodyImage);
 
 const excerpt = advancedData?.excerpt || advancedData?.seoDescription || autoExcerpt || '點擊閱讀全文...';
+const cardExcerpt = excerpt.length > 40 ? `${excerpt.slice(0, 40)}...` : excerpt;
 // 格式化日期
 const formattedDate = post.data.date.toISOString().split('T')[0].replace(/-/g, '.');
 ---
@@ -53,11 +109,24 @@ const formattedDate = post.data.date.toISOString().split('T')[0].replace(/-/g, '
           alt={post.data.title}
           class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
         />
+      ) : resolvedBodyImage?.asset ? (
+        <Image
+          src={resolvedBodyImage.asset}
+          alt={post.data.title}
+          class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+      ) : resolvedBodyImage?.url ? (
+        <img
+          src={resolvedBodyImage.url}
+          alt={post.data.title}
+          class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          loading="lazy"
+        />
       ) : (
         // 🟢 3. 無圖時的優化：使用漸層標題字卡 (取代原本單調的 icon)
         <div class="w-full h-full flex items-center justify-center p-6 bg-gradient-to-br from-primary/5 via-bg to-accent/10 group-hover:from-primary/10 group-hover:to-accent/20 transition-colors">
            <h3 class="text-xl font-serif font-bold text-primary/80 text-center leading-tight line-clamp-3 group-hover:text-primary">
-             {post.data.title}
+             {cardExcerpt}
            </h3>
         </div>
       )}
