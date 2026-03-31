@@ -1,12 +1,12 @@
 ---
-import { ArrowRight, Activity, Award } from 'lucide-react';
+import { ArrowRight, Activity, Award, Building2 } from 'lucide-react';
 import { Image } from 'astro:assets';
 import { getEntry } from 'astro:content';
 import doctorProfile from '../../assets/drchou-profile-2.png';
 
 // 🟢 從 Keystatic 讀取全域設定
 const settings = await getEntry('settings', 'global');
-const { doctorName, doctorTitle, clinicName, slogan, heroIntro } = settings.data;
+const { doctorName, doctorTitle, clinicName, currentHospitalPosition, slogan, heroIntro } = settings.data;
 
 // 文案資料
 const content = {
@@ -51,11 +51,14 @@ const content = {
       <div class="w-24 h-1 mb-8 bg-accent rounded-full"></div>
       
       {/* 職稱 */}
-      <h2 class="text-xl md:text-2xl font-medium mb-6 text-primary/80 flex items-center gap-3">
-        <Award className="text-accent" size={24} />
+      <p class="text-lg md:text-xl font-medium mb-3 text-primary/80 flex items-center gap-3">
+        <Award className="text-accent" size={20} />
         {content.subTitle}
-      </h2>
-
+      </p>
+      <p class="text-lg md:text-xl font-medium mb-6 text-text/70 flex items-center gap-3">
+        <Building2 className="text-accent shrink-0" size={20} />
+        {currentHospitalPosition}
+      </p>
       {/* Slogan & Intro */}
       <blockquote class="border-l-4 border-accent/30 pl-6 mb-8">
         <p class="text-xl md:text-2xl font-serif text-primary mb-4 leading-snug">

@@ -1,11 +1,10 @@
 ---
 import { getEntry } from 'astro:content';
-import { GraduationCap, Award, Stethoscope, Building2, CheckCircle2, Quote } from 'lucide-react';
-import Letter from './Letter.astro';
+import { GraduationCap, Award, Building2, CheckCircle2 } from 'lucide-react';
 
 // 🟢 從 Keystatic 讀取全域設定
 const settings = await getEntry('settings', 'global');
-const { doctorWord, doctorName } = settings.data;
+const { doctorWord, doctorName, currentHospitalPosition } = settings.data;
 
 // 🟢 從 Keystatic 讀取專業履歷
 const resume = await getEntry('resume', 'resume');
@@ -15,113 +14,131 @@ const {
   educations = [], 
   certifications = [] 
 } = resume?.data || {};
+
+const featuredCertifications = certifications.slice(0, 4);
+const remainingCertifications = certifications.slice(4);
+const doctorNoteParagraphs = (doctorWord || '')
+  .split('\n')
+  .map((line) => line.trim())
+  .filter((line) => line.length > 0);
+
+const physicianStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'Physician',
+  name: doctorName,
+  medicalSpecialty: 'Urology',
+  alumniOf: educations,
+  memberOf: associations,
+  hasCredential: certifications,
+};
 ---
 
-<section id="about" class="py-24 bg-surface relative">
+<section id="about" class="py-20 bg-surface relative" aria-labelledby="about-title">
   <div class="container mx-auto px-6">
-    
-    {/* Section Heading */}
-    <div class="mb-16 text-center md:text-left">
+
+    <header class="mb-12 text-center md:text-left">
       <h3 class="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-3">ABOUT DR. CHOU</h3>
-      <h2 class="text-3xl md:text-4xl font-serif font-bold text-primary">學經歷與認證</h2>
-    </div>
+      <h2 id="about-title" class="text-3xl md:text-4xl font-serif font-bold text-primary">學經歷與認證</h2>
+      <p class="mt-4 text-text/80 max-w-3xl leading-relaxed">
+        以完整醫學中心訓練與臨床實務為基礎，專注泌尿科診療與長期照護，提供兼具專業判斷與溫度的醫療建議。
+      </p>
+    </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
-      
-      {/* 左欄：經歷與學會 */}
-      <div class="space-y-12">
-        
-        {/* 專業經歷 */}
-        <div>
-          <h3 class="text-xl font-bold text-primary mb-6 flex items-center gap-3">
-            <span class="w-10 h-10 rounded-full bg-highlight flex items-center justify-center text-accent">
-               <Building2 size={20} />
-            </span>
-            專業經歷
-          </h3>
-          
-          <div class="relative pl-4 ml-5 border-l-2 border-highlight space-y-6">
-            {experiences.map((exp, index) => (
-              <div class="relative">
-                {/* 裝飾圓點 */}
-                <span class="absolute -left-[23px] top-2 w-3.5 h-3.5 bg-bg border-2 border-accent rounded-full"></span>
-                <p class="text-text leading-relaxed hover:text-primary transition-colors duration-300">
-                  {exp}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
+      <article class="lg:col-span-7 rounded-3xl border border-highlight-blue/70 bg-highlight-blue/25 p-6 md:p-8">
+        <h3 class="text-xl font-bold text-primary mb-6 flex items-center gap-3">
+          <span class="w-10 h-10 rounded-full bg-surface flex items-center justify-center text-accent shadow-sm">
+            <Building2 size={20} />
+          </span>
+          專業經歷
+        </h3>
 
-        {/* 專業醫學會 */}
-        <div>
-          <h3 class="text-xl font-bold text-primary mb-6 flex items-center gap-3">
-             <span class="w-10 h-10 rounded-full bg-highlight flex items-center justify-center text-accent">
-               <Award size={20} />
-            </span>
-            專業醫學會
-          </h3>
-          <ul class="grid grid-cols-1 gap-3">
-            {associations.map(assoc => (
-              <li class="flex items-center gap-3 text-text">
-                <CheckCircle2 size={18} className="text-accent/60" />
-                <span>{assoc}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <ul class="relative pl-4 ml-5 border-l-2 border-accent/35 space-y-5">
+          {experiences.map((exp) => (
+            <li class="relative">
+              <span class="absolute -left-[23px] top-2 w-3.5 h-3.5 bg-surface border-2 border-accent rounded-full"></span>
+              <p class="text-text leading-relaxed">{exp}</p>
+            </li>
+          ))}
+        </ul>
+      </article>
 
-      </div>
-
-      {/* 右欄：學歷與證照 */}
-      <div class="space-y-12">
-        
-        {/* 學歷 (卡片式強調) */}
-        <div class="bg-highlight/30 p-8 rounded-3xl border border-highlight">
-          <h3 class="text-xl font-bold text-primary mb-6 flex items-center gap-3">
-             <span class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-accent shadow-sm">
-               <GraduationCap size={20} />
+      <aside class="lg:col-span-5 space-y-6">
+        <article class="rounded-3xl border border-highlight-gold bg-highlight-gold/60 p-6">
+          <h3 class="text-lg font-bold text-primary mb-4 flex items-center gap-3">
+            <span class="w-9 h-9 rounded-full bg-surface flex items-center justify-center text-accent shadow-sm">
+              <GraduationCap size={18} />
             </span>
             學歷
           </h3>
-          <ul class="space-y-4">
-            {educations.map(edu => (
-              <li class="flex flex-col">
-                <span class="font-bold text-primary text-lg">{edu}</span>
-                {/* 如果未來有年份或備註可以加在這裡 */}
-              </li>
+          <ul class="space-y-3 text-sm md:text-base text-text">
+            {educations.map((edu) => (
+              <li class="leading-relaxed">{edu}</li>
             ))}
           </ul>
-        </div>
+        </article>
 
-        {/* 專科證照 (Grid 排列) */}
-        <div>
-          <h3 class="text-xl font-bold text-primary mb-6 flex items-center gap-3">
-             <span class="w-10 h-10 rounded-full bg-highlight flex items-center justify-center text-accent">
-               <Stethoscope size={20} />
+        <article class="rounded-3xl border border-highlight-blue/70 bg-surface p-6">
+          <h3 class="text-lg font-bold text-primary mb-4 flex items-center gap-3">
+            <span class="w-9 h-9 rounded-full bg-highlight-blue flex items-center justify-center text-accent">
+              <Award size={18} />
             </span>
             專科證照
           </h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {certifications.map(cert => (
-              <div class="group flex items-center gap-3 p-4 rounded-xl border border-highlight bg-white hover:border-accent/50 hover:shadow-md transition-all duration-300">
-                <div class="w-8 h-8 rounded-full bg-highlight flex items-center justify-center text-text/50 group-hover:bg-accent group-hover:text-white transition-colors">
-                   <Award size={16} />
-                </div>
-                <span class="text-sm font-bold text-text group-hover:text-primary transition-colors">
-                  {cert}
-                </span>
-              </div>
+          <ul class="space-y-3 text-sm md:text-base text-text">
+            {featuredCertifications.map((cert) => (
+              <li class="flex items-start gap-2">
+                <CheckCircle2 size={16} className="text-accent/70 mt-0.5 shrink-0" />
+                <span>{cert}</span>
+              </li>
             ))}
-          </div>
-        </div>
+          </ul>
 
+          {remainingCertifications.length > 0 && (
+            <details class="mt-4 group">
+              <summary class="cursor-pointer select-none text-sm font-bold text-primary hover:text-accent transition-colors">
+                更多證照
+              </summary>
+              <ul class="mt-3 space-y-2 text-sm text-text/85">
+                {remainingCertifications.map((cert) => (
+                  <li>{cert}</li>
+                ))}
+              </ul>
+            </details>
+          )}
+        </article>
 
-      </div>
-
+        <article class="rounded-3xl border border-highlight-blue/60 bg-surface p-6">
+          <h3 class="text-lg font-bold text-primary mb-4">專業醫學會</h3>
+          <ul class="flex flex-wrap gap-2">
+            {associations.map((assoc) => (
+              <li class="px-3 py-1.5 rounded-full bg-highlight-blue text-text text-sm border border-highlight-blue/80">
+                {assoc}
+              </li>
+            ))}
+          </ul>
+        </article>
+      </aside>
     </div>
 
-    <Letter/>
+    {doctorNoteParagraphs.length > 0 && (
+      <article class="mt-10 rounded-2xl border-l-4 border-accent bg-highlight-gold/45 p-5 md:p-6">
+        <div class="space-y-4 text-text/85 leading-relaxed">
+          {doctorNoteParagraphs.map((paragraph, index) => (
+            <p class:list={[
+              { 'text-primary font-medium': index === 1 }
+            ]}>
+              {paragraph}
+            </p>
+          ))}
+        </div>
+        <div class="mt-6 text-right">
+          <p class="text-sm font-bold text-primary">—— {doctorName} 醫師</p>
+        </div>
+      </article>
+    )}
+
+    <script type="application/ld+json" set:html={JSON.stringify(physicianStructuredData)} />
 
   </div>
 </section>

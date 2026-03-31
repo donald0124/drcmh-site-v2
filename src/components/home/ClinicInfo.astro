@@ -17,6 +17,11 @@ const clinicData = {
   phone: phone || "(診所電話建置中)", 
   email: email || "d10822201@gmail.com",
   mapLink: googleMapEmbedLink || "https://www.google.com/maps/search/?api=1&query=新北市新店區二十張路5號1樓",
+  mapEmbedLink: googleMapEmbedLink?.includes('/maps/embed') || googleMapEmbedLink?.includes('output=embed')
+    ? googleMapEmbedLink
+    : `https://www.google.com/maps?q=${encodeURIComponent(address || '新北市新店區二十張路5號1樓')}&output=embed`,
+  navigationLink: `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address || '新北市新店區二十張路5號1樓')}`,
+  callLink: `tel:${(phone || '').replace(/\s/g, '')}`,
   bookingLink: bookingLink || "#",
 };
 
@@ -110,14 +115,24 @@ const getStatusClass = (status) => {
               <div>
                 <p class="text-xs font-bold text-text/40 uppercase tracking-widest mb-1">Address</p>
                 <p class="text-lg text-primary font-medium">{clinicData.address}</p>
-                <a 
-                  href={clinicData.mapLink} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  class="inline-flex items-center gap-1 text-sm text-accent font-bold mt-2 hover:text-primary transition-colors border-b border-accent/30 pb-0.5 hover:border-primary"
-                >
-                  在 Google Maps 上查看 <ExternalLink size={14} />
-                </a>
+                <div class="mt-3 flex flex-wrap gap-2">
+                  <a 
+                    href={clinicData.navigationLink} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-1 text-sm font-bold text-white bg-primary hover:bg-accent px-3 py-1.5 rounded-lg transition-colors"
+                  >
+                    一鍵導航 <ExternalLink size={14} />
+                  </a>
+                  <a 
+                    href={clinicData.mapLink} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-1 text-sm font-bold text-primary border border-primary/25 hover:border-accent hover:text-accent px-3 py-1.5 rounded-lg transition-colors"
+                  >
+                    查看地圖 <ExternalLink size={14} />
+                  </a>
+                </div>
               </div>
             </div>
             
@@ -128,7 +143,15 @@ const getStatusClass = (status) => {
               </div>
               <div>
                 <p class="text-xs font-bold text-text/40 uppercase tracking-widest mb-1">Phone</p>
-                <p class="text-lg text-primary font-medium">{clinicData.phone}</p>
+                <div class="flex flex-wrap items-center gap-3">
+                  <p class="text-lg text-primary font-medium">{clinicData.phone}</p>
+                  <a
+                    href={clinicData.callLink}
+                    class="inline-flex items-center text-sm font-bold text-accent border-b border-accent/30 pb-0.5 hover:text-primary hover:border-primary transition-colors"
+                  >
+                    一鍵撥號
+                  </a>
+                </div>
               </div>
             </div>
 
@@ -145,17 +168,29 @@ const getStatusClass = (status) => {
 
           </div>
 
+          <div class="mt-10 rounded-2xl overflow-hidden border border-white/60 shadow-sm">
+            <iframe
+              title={`${clinicData.name} 地圖`}
+              src={clinicData.mapEmbedLink}
+              class="w-full h-[260px]"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              allowfullscreen
+            ></iframe>
+          </div>
+
           {/* CTA 按鈕 */}
           <div class="mt-12 pt-8 border-t border-gray-100">
-            <a 
-              href={clinicData.bookingLink} 
-              target="_blank"
-              class="block w-full text-center py-4 bg-accent hover:bg-[#B08D55] text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
+            <button
+              type="button"
+              disabled
+              aria-disabled="true"
+              class="block w-full text-center py-4 bg-gray-300 text-white font-bold rounded-xl cursor-not-allowed"
             >
-              前往線上掛號
-            </a>
+              建置中
+            </button>
             <p class="text-center text-xs text-text/50 mt-3">
-              * 將開啟外部掛號系統頁面
+              * 線上掛號功能準備中
             </p>
           </div>
 
@@ -188,9 +223,9 @@ const getStatusClass = (status) => {
               <div class="text-text/40 font-bold text-sm flex items-center justify-center">
                 <Calendar size={16} />
               </div>
-              <div class="text-primary font-bold text-sm bg-highlight/50 py-2 rounded-lg">早 (0900-1130)</div>
-              <div class="text-primary font-bold text-sm bg-highlight/50 py-2 rounded-lg">午 (1430-1700)</div>
-              <div class="text-primary font-bold text-sm bg-highlight/50 py-2 rounded-lg">晚 (1800-2100)</div>
+              <div class="text-primary font-bold text-sm bg-highlight/50 py-2 rounded-lg">早診 (09:00-12:00)</div>
+              <div class="text-primary font-bold text-sm bg-highlight/50 py-2 rounded-lg">午診 (14:30-17:30)</div>
+              <div class="text-primary font-bold text-sm bg-highlight/50 py-2 rounded-lg">夜診 (18:30-20:30)</div>
            </div>
            
            {/* 表格內容 */}

@@ -1,0 +1,209 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+
+type ShortsItem = {
+  title: string;
+  date: Date | string;
+  youtubeUrl: string;
+};
+
+const videos = await getCollection('videos');
+const shortsEntry = await getEntry('shorts', 'index');
+
+const sortedVideos = [...videos].sort(
+  (a, b) => new Date(b.data.date).valueOf() - new Date(a.data.date).valueOf()
+);
+const latestVideo = sortedVideos[0] ?? null;
+
+const shortsList = (shortsEntry?.data?.list ?? []) as ShortsItem[];
+const sortedShorts = [...shortsList].sort(
+  (a, b) => new Date(b.date).valueOf() - new Date(a.date).valueOf()
+);
+const latestShorts = sortedShorts.slice(0, 2);
+
+const hasContent = latestVideo !== null || latestShorts.length > 0;
+
+function parseYouTubeId(rawUrl: string): string | null {
+  try {
+    const url = new URL(rawUrl);
+    const host = url.hostname.replace('www.', '');
+    if (host === 'youtu.be') {
+      const id = url.pathname.split('/').filter(Boolean)[0];
+      return id && id.length === 11 ? id : null;
+    }
+    if (host === 'youtube.com' || host === 'm.youtube.com') {
+      if (url.pathname === '/watch') {
+        const id = url.searchParams.get('v');
+        return id && id.length === 11 ? id : null;
+      }
+      const parts = url.pathname.split('/').filter(Boolean);
+      const embedIdx = parts.indexOf('embed');
+      if (embedIdx !== -1) {
+        const id = parts[embedIdx + 1];
+        return id && id.length === 11 ? id : null;
+      }
+      const shortsIdx = parts.indexOf('shorts');
+      if (shortsIdx !== -1) {
+        const id = parts[shortsIdx + 1];
+        return id && id.length === 11 ? id : null;
+      }
+    }
+  } catch {
+    // fall through to regex
+  }
+  const match = rawUrl.match(
+    /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/
+  );
+  return match?.[1] ?? null;
+}
+
+function toThumbnailUrl(youtubeUrl: string): string | null {
+  const id = parseYouTubeId(youtubeUrl);
+  return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : null;
+}
+
+function formatDate(date: Date | string): string {
+  return new Date(date).toLocaleDateString('zh-TW', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+}
+---
+
+{hasContent && (
+  <section id="video-highlights" class="py-16 bg-bg" aria-label="最新影音精選">
+    <div class="container mx-auto px-6">
+
+      {/* Section Header */}
+      <div class="mb-8">
+        <p class="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-2">VIDEO HIGHLIGHTS</p>
+        <h2 class="text-3xl md:text-4xl font-serif font-bold text-primary">最新影音精選</h2>
+        <p class="text-text/70 mt-3 text-sm">快速掌握最新衛教重點與短影音內容。</p>
+      </div>
+
+      {/* Shorts — mobile horizontal scroll */}
+      {latestShorts.length > 0 && (
+        <div class="md:hidden -mx-6 px-6 overflow-x-auto pb-2 mb-10" role="region" aria-label="最新短影音">
+          <div class="flex gap-4 w-max snap-x snap-mandatory items-stretch">
+
+            {/* Short video cards with embed */}
+            {latestShorts.map((item) => {
+              const youtubeId = parseYouTubeId(item.youtubeUrl);
+              const embedUrl = youtubeId ? `https://www.youtube.com/embed/${youtubeId}?autoplay=0&fs=1` : null;
+              return (
+                <div
+                  class="snap-start shrink-0 w-[56vw] max-w-[230px] min-w-[180px] rounded-2xl bg-surface border border-highlight-blue overflow-hidden hover:shadow-md transition-shadow flex flex-col"
+                  aria-label={item.title}
+                >
+                  <div class="aspect-[9/16] bg-highlight-blue/40 flex-shrink-0">
+                    {embedUrl
+                      ? <iframe
+                          src={embedUrl}
+                          class="w-full h-full border-none"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          loading="lazy"
+                        />
+                      : <div class="w-full h-full flex items-center justify-center text-text/50 text-xs p-2 text-center">YouTube Shorts</div>
+                    }
+                  </div>
+                  <div class="p-3 flex-grow flex flex-col justify-between">
+                    <div>
+                      <p class="text-xs text-text/60 mb-1">{formatDate(item.date)}</p>
+                      <h4 class="text-xs font-bold text-primary leading-snug line-clamp-2">{item.title}</h4>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* See more button - small circular */}
+            <a
+              href="/video"
+              class="snap-start shrink-0 w-14 h-14 rounded-full border-2 border-accent bg-highlight-gold text-primary hover:bg-accent hover:text-white transition-all flex items-center justify-center flex-shrink-0"
+              aria-label="查看更多短影音"
+            >
+              <span class="text-xl leading-none" aria-hidden="true">→</span>
+            </a>
+
+          </div>
+        </div>
+      )}
+
+      {/* Shorts — desktop grid */}
+      {latestShorts.length > 0 && (
+        <div class="hidden md:grid md:grid-cols-2 gap-6 mb-10">
+          {latestShorts.map((item) => {
+            const youtubeId = parseYouTubeId(item.youtubeUrl);
+            const embedUrl = youtubeId ? `https://www.youtube.com/embed/${youtubeId}?autoplay=0&fs=1` : null;
+            return (
+              <div
+                class="group flex gap-4 rounded-2xl bg-surface border border-highlight-blue overflow-hidden hover:shadow-md transition-shadow p-4"
+                aria-label={item.title}
+              >
+                <div class="shrink-0 w-24 aspect-[9/16] rounded-xl overflow-hidden bg-highlight-blue/40">
+                  {embedUrl
+                    ? <iframe
+                        src={embedUrl}
+                        class="w-full h-full border-none"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        loading="lazy"
+                      />
+                    : <div class="w-full h-full flex items-center justify-center text-text/50 text-xs">Shorts</div>
+                  }
+                </div>
+                <div class="flex flex-col justify-center min-w-0">
+                  <p class="text-xs text-accent font-bold tracking-widest uppercase mb-1">Shorts</p>
+                  <p class="text-xs text-text/60 mb-2">{formatDate(item.date)}</p>
+                  <h4 class="text-sm font-bold text-primary leading-snug line-clamp-3">{item.title}</h4>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Latest landscape video — full width with embed */}
+      {latestVideo && (
+        <div class="rounded-3xl bg-surface border border-highlight-blue overflow-hidden">
+          <div class="aspect-video bg-highlight-blue/40 flex flex-col items-center justify-center">
+            {parseYouTubeId(latestVideo.data.youtubeUrl)
+              ? (
+                <iframe
+                  src={`https://www.youtube.com/embed/${parseYouTubeId(latestVideo.data.youtubeUrl)}?autoplay=0&fs=1&rel=0`}
+                  class="w-full h-full border-none"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  loading="lazy"
+                />
+              )
+              : <div class="w-full h-full flex items-center justify-center text-text/50 text-lg">Video unavailable</div>
+            }
+          </div>
+          <div class="p-5 md:p-6">
+            <p class="text-xs text-text/60 mb-2">{formatDate(latestVideo.data.date)}</p>
+            <h3 class="text-xl md:text-2xl font-bold text-primary leading-snug">{latestVideo.data.title}</h3>
+            {latestVideo.data.description && (
+              <p class="text-sm text-text/70 mt-2 line-clamp-2">{latestVideo.data.description}</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* See more button */}
+      {latestVideo && (
+        <div class="mt-6 text-center md:text-left">
+          <a
+            href="/video"
+            class="inline-flex items-center gap-3 px-8 py-3 rounded-full bg-primary text-white font-bold hover:bg-accent transition-colors hover:shadow-lg"
+          >
+            查看全部影音 <span aria-hidden="true" class="text-xl">→</span>
+          </a>
+        </div>
+      )}
+
+    </div>
+  </section>
+)}

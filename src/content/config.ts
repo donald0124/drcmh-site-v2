@@ -81,6 +81,7 @@ const settings = defineCollection({
   schema: ({ image }) => z.object({
     doctorName: z.string().default('周孟翰'),
     doctorTitle: z.string().default('院長'),
+    currentHospitalPosition: z.string().optional(),
     clinicName: z.string(),
     avatar: image().optional(),
     slogan: z.string().optional(),
