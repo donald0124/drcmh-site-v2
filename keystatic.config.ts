@@ -34,6 +34,9 @@ export default config({
         // --- 1. 醫師基本資料 ---
         doctorName: fields.text({ label: '醫師姓名', defaultValue: '周孟翰' }),
         doctorTitle: fields.text({ label: '醫師職稱', defaultValue: '院長' }),
+        currentHospitalPosition: fields.text({
+          label: '現職醫院職位',
+        }),
         clinicName: fields.text({ label: '診所名稱', defaultValue: '新店高美泌尿科診所' }), // 原本就有的
 
         // --- 2. 圖片設定 (關鍵：存到 src/assets 以利優化) ---
@@ -76,7 +79,10 @@ export default config({
         email: fields.text({ label: '聯絡 Email' }),
         address: fields.text({ label: '診所地址' }),
         bookingLink: fields.url({ label: '線上掛號連結' }),
-        googleMapEmbedLink: fields.url({ label: 'Google 地圖嵌入連結' }),
+        googleMapEmbedLink: fields.url({
+          label: 'Google 地圖連結',
+          defaultValue: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3616.51512190352!2d121.53749303737627!3d24.98260654045585!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x346801201ea578d5%3A0x5b4d80d552da23c9!2z5paw5bqX6auY576O5rOM5bC_56eR6Ki15omA!5e0!3m2!1szh-TW!2stw!4v1775477814530!5m2!1szh-TW!2stw'
+        }),
 
         // --- 5. 社群連結 ---
         facebook: fields.url({ label: 'Facebook 連結' }),

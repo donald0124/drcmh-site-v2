@@ -1,272 +1,663 @@
 ---
-import { getEntry } from 'astro:content';
-import { MapPin, Phone, Mail, Clock, Calendar, ExternalLink } from 'lucide-react';
+import { Image } from "astro:assets";
+import BankImg from "../../assets/images/parking-next-to-bank.jpg";
+import Jmart1Img from "../../assets/images/parking-times-JMART1.jpg";
+import Jmart2Img from "../../assets/images/parking-times-JMART2.jpg";
+import MapImg from "../../assets/images/XDGM-parking-map.jpg";
+import { getEntry } from "astro:content";
+import {
+  MapPin,
+  Phone,
+  Clock,
+  Calendar,
+  Navigation,
+  Train,
+  Bus,
+  CarFront,
+  Bike,
+  Mail,
+} from "lucide-react";
 
 // 🟢 從 Keystatic 讀取全域設定
-const settings = await getEntry('settings', 'global');
-const { doctorName, doctorTitle, clinicName, address, phone, email, bookingLink, googleMapEmbedLink } = settings.data;
+const settings = await getEntry("settings", "global");
+if (!settings) throw new Error("global settings not found");
+const {
+  doctorName,
+  doctorTitle,
+  clinicName,
+  address,
+  phone,
+  bookingLink,
+  googleMapEmbedLink,
+  email,
+} = settings.data;
 
 // 🟢 從 Keystatic 讀取門診表設定
-const scheduleData = await getEntry('schedule', 'timetable');
+const scheduleData = await getEntry("schedule", "timetable");
+
+const fallbackAddress = "231 新北市新店區二十張路 5 號 1 樓";
+const fallbackPhone = "(02) 2671-8910";
+const fallbackGoogleMapPageUrl = "https://maps.app.goo.gl/MU3R8XXKV7bweCAU9";
+const fallbackGoogleMapEmbedUrl =
+  "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3616.51512190352!2d121.53749303737627!3d24.98260654045585!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x346801201ea578d5%3A0x5b4d80d552da23c9!2z5paw5bqX6auY576O5rOM5bC_56eR6Ki15omA!5e0!3m2!1szh-TW!2stw!4v1775477814530!5m2!1szh-TW!2stw";
+
+const rawMapInput = (googleMapEmbedLink || "").trim();
+const iframeSrcMatch = rawMapInput.match(/src=["']([^"']+)["']/i);
+const normalizedMapInput = iframeSrcMatch?.[1] || rawMapInput;
+const selectedMapInput = normalizedMapInput || fallbackGoogleMapEmbedUrl;
+const isEmbedUrl =
+  selectedMapInput.includes("/maps/embed") ||
+  selectedMapInput.includes("output=embed") ||
+  selectedMapInput.includes("pb=!");
 
 const clinicData = {
   name: clinicName || "新店高美泌尿科診所",
-  doctor: "周孟翰",
+  doctor: doctorName || "周孟翰",
   title: doctorTitle || "院長",
-  address: address || "新北市新店區二十張路5號1樓",
-  phone: phone || "(診所電話建置中)", 
-  email: email || "d10822201@gmail.com",
-  mapLink: googleMapEmbedLink || "https://www.google.com/maps/search/?api=1&query=新北市新店區二十張路5號1樓",
-  mapEmbedLink: googleMapEmbedLink?.includes('/maps/embed') || googleMapEmbedLink?.includes('output=embed')
-    ? googleMapEmbedLink
-    : `https://www.google.com/maps?q=${encodeURIComponent(address || '新北市新店區二十張路5號1樓')}&output=embed`,
-  navigationLink: `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address || '新北市新店區二十張路5號1樓')}`,
-  callLink: `tel:${(phone || '').replace(/\s/g, '')}`,
-  bookingLink: bookingLink || "#",
+  address: address || fallbackAddress,
+  phone: phone || fallbackPhone,
+  mapEmbedLink: isEmbedUrl
+    ? selectedMapInput
+    : `https://www.google.com/maps?q=${encodeURIComponent(selectedMapInput)}&output=embed`,
+  mapLink: isEmbedUrl ? fallbackGoogleMapPageUrl : selectedMapInput,
+  navigationLink: isEmbedUrl ? fallbackGoogleMapPageUrl : selectedMapInput,
+  callLink: `tel:${(phone || fallbackPhone).replace(/[\s\-()]/g, "")}`,
 };
 
 // 門診表設定
 const weeklySchedule = scheduleData?.data?.weeklySchedule || [];
 const lastUpdated = scheduleData?.data?.lastUpdated;
 
-// 格式化日期 (YYYY-MM-DD -> YYYY/MM/DD)
-const formattedUpdatedDate = lastUpdated 
-  ? new Date(lastUpdated).toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' })
-  : '';
+const formattedUpdatedDate = lastUpdated
+  ? new Date(lastUpdated).toLocaleDateString("zh-TW", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    })
+  : "";
 
-// 預設門診表 (當 Keystatic 尚未設定時的備分)
-const defaultSchedule = [
-  { day: "週一", morning: { status: "看診" }, afternoon: { status: "看診" }, evening: { status: "看診" } },
-  { day: "週二", morning: { status: "休診" }, afternoon: { status: "看診" }, evening: { status: "看診" } },
-  { day: "週三", morning: { status: "看診" }, afternoon: { status: "休診" }, evening: { status: "看診" } },
-  { day: "週四", morning: { status: "休診" }, afternoon: { status: "看診" }, evening: { status: "看診" } },
-  { day: "週五", morning: { status: "看診" }, afternoon: { status: "看診" }, evening: { status: "休診" } },
-  { day: "週六", morning: { status: "看診" }, afternoon: { status: "休診" }, evening: { status: "休診" } },
+type SlotType = { status: string; customLabel?: string; note?: string };
+type ScheduleRow = {
+  day: string;
+  morning: SlotType;
+  afternoon: SlotType;
+  evening: SlotType;
+};
+
+const defaultSchedule: ScheduleRow[] = [
+  {
+    day: "週一",
+    morning: { status: "看診" },
+    afternoon: { status: "看診" },
+    evening: { status: "看診" },
+  },
+  {
+    day: "週二",
+    morning: { status: "休診" },
+    afternoon: { status: "看診" },
+    evening: { status: "看診" },
+  },
+  {
+    day: "週三",
+    morning: { status: "看診" },
+    afternoon: { status: "休診" },
+    evening: { status: "看診" },
+  },
+  {
+    day: "週四",
+    morning: { status: "休診" },
+    afternoon: { status: "看診" },
+    evening: { status: "看診" },
+  },
+  {
+    day: "週五",
+    morning: { status: "看診" },
+    afternoon: { status: "看診" },
+    evening: { status: "休診" },
+  },
+  {
+    day: "週六",
+    morning: { status: "看診" },
+    afternoon: { status: "休診" },
+    evening: { status: "休診" },
+  },
 ];
 
-const displaySchedule = weeklySchedule.length > 0 ? weeklySchedule : defaultSchedule;
+const displaySchedule: ScheduleRow[] =
+  weeklySchedule.length > 0
+    ? (weeklySchedule as ScheduleRow[])
+    : defaultSchedule;
 
-// 輔助函式：取得顯示文字
-const getStatusLabel = (slot) => {
-  if (!slot) return '-';
-  if (slot.status === '自訂') return slot.customLabel || '-';
-  if (slot.status === '看診') return '✔'; // 使用 Heavy Check Mark (粗勾勾)
-  if (slot.status === '休診') return '-';
-  if (slot.status === '特約診') return '特約';
-  if (slot.status === '手術日') return '手術';
+const getStatusLabel = (slot: any) => {
+  if (!slot) return "-";
+  if (slot.status === "自訂") return slot.customLabel || "-";
+  if (slot.status === "看診") return "✔";
+  if (slot.status === "休診") return "-";
+  if (slot.status === "特約診") return "特約";
+  if (slot.status === "手術日") return "手術";
   return slot.status;
 };
 
-// 輔助函式：取得樣式
-const getStatusClass = (status) => {
-   if (status === '看診') return 'text-accent font-bold bg-accent/10';
-   if (status === '休診') return 'text-text/20';
-   if (status === '特約診') return 'text-red-500 font-bold bg-red-100';
-   if (status === '手術日') return 'text-blue-500 font-bold bg-blue-100';
-   if (status === '自訂') return 'text-primary font-bold bg-gray-100';
-   return 'text-text/20';
+const getStatusClass = (status: string) => {
+  if (status === "看診") return "text-accent font-bold bg-accent/10";
+  if (status === "休診") return "text-text/20";
+  if (status === "特約診") return "text-red-500 font-bold bg-red-100";
+  if (status === "手術日") return "text-blue-500 font-bold bg-blue-100";
+  if (status === "自訂") return "text-primary font-bold bg-gray-100";
+  return "text-text/20";
 };
 ---
 
-<section id="clinic" class="py-24 bg-bg relative overflow-hidden">
-  
-  {/* 背景裝飾：右側傾斜色塊 */}
-  <div class="absolute top-0 right-0 w-1/3 h-full bg-highlight/30 -skew-x-12 translate-x-20 z-0 pointer-events-none"></div>
+<section
+  id="clinic"
+  class="py-24 bg-bg relative overflow-hidden"
+  aria-label="門診資訊"
+>
+  {/* 背景裝飾 */}
+  <div
+    class="absolute top-0 right-0 w-1/3 h-full bg-highlight/30 -skew-x-12 translate-x-20 z-0 pointer-events-none"
+    aria-hidden="true"
+  >
+  </div>
 
-  <div class="container mx-auto px-6 relative z-10">
-    
-    {/* 標題區塊 */}
-    <div class="mb-16 text-center md:text-left">
-      <h3 class="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-3">CLINIC INFO</h3>
-      <h2 class="text-3xl md:text-4xl font-serif font-bold text-primary">門診資訊</h2>
-    </div>
-
-    <div class="flex flex-col lg:flex-row gap-12 lg:gap-20">
-      
-      {/* 左側：診所詳情卡片 */}
-      <div class="lg:w-1/2">
-        <div class="bg-surface border border-white/50 shadow-2xl rounded-3xl p-8 md:p-12 relative overflow-hidden group">
-          
-          {/* 裝飾光暈 */}
-          <div class="absolute -top-24 -right-24 w-48 h-48 bg-accent/10 rounded-full blur-3xl group-hover:bg-accent/20 transition-colors duration-500"></div>
-
-          {/* 標籤 */}
-          <div class="inline-block px-4 py-1.5 bg-primary text-white text-xs font-bold tracking-wider rounded-md mb-8 shadow-md">
-            CURRENT LOCATION
-          </div>
-
-          {/* 診所名稱 */}
-          <h3 class="text-3xl font-serif font-bold text-primary mb-2">
-            {clinicData.name}
-          </h3>
-          <p class="text-accent font-medium mb-10 text-lg flex items-center gap-2">
-            <span class="w-8 h-0.5 bg-accent inline-block"></span>
-            {clinicData.title} | {clinicData.doctor} 醫師
+  <div
+    class="container mx-auto px-4 sm:px-6 relative z-10 space-y-24 lg:space-y-28"
+  >
+    {/* ── 上半部：駐診與門診時刻表 ── */}
+    <div
+      class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 max-w-6xl mx-auto w-full items-stretch"
+    >
+      {/* 左欄：目前所在診所、個人聯絡email */}
+      <div class="flex flex-col">
+        <div class="mb-10 text-left">
+          <p
+            class="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-3 flex items-center justify-start gap-2"
+          >
+            <MapPin size={14} aria-hidden="true" /> CLINIC INFO
           </p>
+          <h2 class="text-3xl md:text-4xl font-serif font-bold text-primary">
+            門診與聯絡資訊
+          </h2>
+        </div>
 
-          {/* 聯絡資訊列表 */}
-          <div class="space-y-8">
-            
-            {/* 地址 */}
-            <div class="flex items-start gap-5">
-              <div class="w-10 h-10 rounded-full bg-bg flex items-center justify-center text-accent shrink-0 mt-1">
-                <MapPin size={20} />
-              </div>
-              <div>
-                <p class="text-xs font-bold text-text/40 uppercase tracking-widest mb-1">Address</p>
-                <p class="text-lg text-primary font-medium">{clinicData.address}</p>
-                <div class="mt-3 flex flex-wrap gap-2">
-                  <a 
-                    href={clinicData.navigationLink} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    class="inline-flex items-center gap-1 text-sm font-bold text-white bg-primary hover:bg-accent px-3 py-1.5 rounded-lg transition-colors"
-                  >
-                    一鍵導航 <ExternalLink size={14} />
-                  </a>
-                  <a 
-                    href={clinicData.mapLink} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    class="inline-flex items-center gap-1 text-sm font-bold text-primary border border-primary/25 hover:border-accent hover:text-accent px-3 py-1.5 rounded-lg transition-colors"
-                  >
-                    查看地圖 <ExternalLink size={14} />
-                  </a>
-                </div>
-              </div>
-            </div>
-            
-            {/* 電話 */}
-            <div class="flex items-start gap-5">
-              <div class="w-10 h-10 rounded-full bg-bg flex items-center justify-center text-accent shrink-0 mt-1">
-                <Phone size={20} />
-              </div>
-              <div>
-                <p class="text-xs font-bold text-text/40 uppercase tracking-widest mb-1">Phone</p>
-                <div class="flex flex-wrap items-center gap-3">
-                  <p class="text-lg text-primary font-medium">{clinicData.phone}</p>
-                  <a
-                    href={clinicData.callLink}
-                    class="inline-flex items-center text-sm font-bold text-accent border-b border-accent/30 pb-0.5 hover:text-primary hover:border-primary transition-colors"
-                  >
-                    一鍵撥號
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            {/* Email */}
-            <div class="flex items-start gap-5">
-              <div class="w-10 h-10 rounded-full bg-bg flex items-center justify-center text-accent shrink-0 mt-1">
-                <Mail size={20} />
-              </div>
-              <div>
-                <p class="text-xs font-bold text-text/40 uppercase tracking-widest mb-1">Email</p>
-                <p class="text-lg text-primary font-medium break-all">{clinicData.email}</p>
-              </div>
-            </div>
-
-          </div>
-
-          <div class="mt-10 rounded-2xl overflow-hidden border border-white/60 shadow-sm">
-            <iframe
-              title={`${clinicData.name} 地圖`}
-              src={clinicData.mapEmbedLink}
-              class="w-full h-[260px]"
-              loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"
-              allowfullscreen
-            ></iframe>
-          </div>
-
-          {/* CTA 按鈕 */}
-          <div class="mt-12 pt-8 border-t border-gray-100">
-            <button
-              type="button"
-              disabled
-              aria-disabled="true"
-              class="block w-full text-center py-4 bg-gray-300 text-white font-bold rounded-xl cursor-not-allowed"
+        <div
+          class="bg-surface rounded-3xl p-6 sm:p-8 md:p-10 shadow-xl border border-white/80 space-y-8 flex-1 flex flex-col justify-center"
+        >
+          <div class="flex items-start gap-4">
+            <div
+              class="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-primary shrink-0 mt-0.5"
+              aria-hidden="true"
             >
-              建置中
-            </button>
-            <p class="text-center text-xs text-text/50 mt-3">
-              * 線上掛號功能準備中
+              <MapPin size={24} strokeWidth={2.5} />
+            </div>
+            <div>
+              <h3
+                class="text-xs font-bold text-text/40 uppercase tracking-widest mb-1.5"
+              >
+                目前看診地點
+              </h3>
+              <p
+                class="text-xl md:text-2xl font-bold text-primary leading-tight"
+              >
+                {clinicData.name}
+              </p>
+              <p
+                class="text-xl md:text-2xl font-bold text-primary leading-tight"
+              >
+                三軍總醫院汀州院區
+              </p>
+            </div>
+          </div>
+
+          <div class="w-full h-px bg-gray-100" aria-hidden="true"></div>
+
+          <div class="flex items-start gap-4">
+            <div
+              class="w-12 h-12 rounded-2xl bg-highlight/50 border border-highlight flex items-center justify-center text-accent shrink-0 mt-0.5"
+              aria-hidden="true"
+            >
+              <Mail size={24} strokeWidth={2.5} />
+            </div>
+            <div class="min-w-0">
+              <h3
+                class="text-xs font-bold text-text/40 uppercase tracking-widest mb-1.5"
+              >
+                個人聯絡 Email
+              </h3>
+              {
+                email ? (
+                  <a
+                    href={`mailto:${email}`}
+                    class="text-lg font-bold text-primary hover:text-accent transition-colors block break-words"
+                  >
+                    {email}
+                  </a>
+                ) : (
+                  <p class="text-lg font-bold text-primary">暫無提供</p>
+                )
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 右欄：門診時刻表 */}
+      <div class="flex flex-col">
+        <div class="mb-10 text-left lg:text-center">
+          <p
+            class="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-3 flex items-center justify-start lg:justify-center gap-2"
+          >
+            <Clock size={14} aria-hidden="true" /> SCHEDULE
+          </p>
+          <h2
+            class="text-3xl md:text-4xl font-serif font-bold text-primary flex flex-col sm:flex-row items-start lg:items-center justify-start lg:justify-center gap-3"
+          >
+            門診時刻表
+            {
+              formattedUpdatedDate && (
+                <span class="text-[0.65rem] font-normal leading-none bg-accent/10 text-accent px-3 py-1.5 rounded-full border border-accent/20 shadow-sm mt-1 sm:mt-0">
+                  更新日期：{formattedUpdatedDate}
+                </span>
+              )
+            }
+          </h2>
+          <p class="text-sm text-text/60 mt-3">
+            週日休診，國定假日請見首頁公告
+          </p>
+        </div>
+
+        <div
+          class="bg-surface rounded-3xl p-5 sm:p-8 md:p-10 shadow-xl border border-white/80 flex-1 flex flex-col"
+        >
+          {/* 表頭 */}
+          <div class="grid grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6 text-center">
+            <div
+              class="text-text/40 font-bold text-sm flex items-center justify-center bg-gray-50/50 rounded-xl py-2"
+              aria-hidden="true"
+            >
+              <Calendar size={18} />
+            </div>
+            <div
+              class="text-primary font-bold text-xs sm:text-sm bg-highlight/50 py-2.5 rounded-xl leading-tight"
+            >
+              早診<span
+                class="block text-[0.65rem] font-normal opacity-70 mt-0.5"
+                >09:00–12:00</span
+              >
+            </div>
+            <div
+              class="text-primary font-bold text-xs sm:text-sm bg-highlight/50 py-2.5 rounded-xl leading-tight"
+            >
+              午診<span
+                class="block text-[0.65rem] font-normal opacity-70 mt-0.5"
+                >14:30–17:30</span
+              >
+            </div>
+            <div
+              class="text-primary font-bold text-xs sm:text-sm bg-highlight/50 py-2.5 rounded-xl leading-tight"
+            >
+              夜診<span
+                class="block text-[0.65rem] font-normal opacity-70 mt-0.5"
+                >18:30–20:30</span
+              >
+            </div>
+          </div>
+
+          {/* 表格列 */}
+          <div
+            class="space-y-2 sm:space-y-3 flex-1"
+            role="list"
+            aria-label="每週門診時刻"
+          >
+            {
+              displaySchedule.map((s) => (
+                <div
+                  class="grid grid-cols-4 gap-2 sm:gap-4 items-center text-center group hover:bg-highlight/20 rounded-xl transition-colors py-2 px-1"
+                  role="listitem"
+                >
+                  <div class="font-bold text-primary text-sm sm:text-base group-hover:text-accent transition-colors">
+                    {s.day}
+                  </div>
+                  <div
+                    class={`text-xs sm:text-sm py-2 sm:py-3 rounded-xl flex flex-col justify-center items-center transition-all ${getStatusClass(s.morning?.status)}`}
+                  >
+                    <span>{getStatusLabel(s.morning)}</span>
+                    {s.morning?.note && (
+                      <span class="text-[0.6rem] opacity-80 mt-0.5 font-normal leading-tight">
+                        {s.morning.note}
+                      </span>
+                    )}
+                  </div>
+                  <div
+                    class={`text-xs sm:text-sm py-2 sm:py-3 rounded-xl flex flex-col justify-center items-center transition-all ${getStatusClass(s.afternoon?.status)}`}
+                  >
+                    <span>{getStatusLabel(s.afternoon)}</span>
+                    {s.afternoon?.note && (
+                      <span class="text-[0.6rem] opacity-80 mt-0.5 font-normal leading-tight">
+                        {s.afternoon.note}
+                      </span>
+                    )}
+                  </div>
+                  <div
+                    class={`text-xs sm:text-sm py-2 sm:py-3 rounded-xl flex flex-col justify-center items-center transition-all ${getStatusClass(s.evening?.status)}`}
+                  >
+                    <span>{getStatusLabel(s.evening)}</span>
+                    {s.evening?.note && (
+                      <span class="text-[0.6rem] opacity-80 mt-0.5 font-normal leading-tight">
+                        {s.evening.note}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+
+          <div
+            class="mt-8 p-4 bg-highlight/30 rounded-xl border border-highlight/50 text-sm text-text/70 leading-relaxed flex gap-3 mt-auto"
+          >
+            <span
+              class="text-accent font-black shrink-0 mt-0.5"
+              aria-hidden="true">!</span
+            >
+            <p>
+              實際看診時間可能因會議或手術有所異動，建議來院前先透過電話確認。
             </p>
           </div>
-
         </div>
       </div>
-
-      {/* 右側：門診時間表 */}
-      <div class="lg:w-1/2 flex flex-col justify-center">
-        
-        <div class="mb-8 flex items-center gap-3">
-           <div class="p-3 bg-white rounded-full text-accent shadow-sm">
-             <Clock size={24} />
-           </div>
-           <div>
-             <h3 class="text-xl font-bold text-primary flex items-center gap-3">
-               門診時刻表
-               {formattedUpdatedDate && (
-                 <span class="text-[0.65rem] font-normal bg-accent/10 text-accent px-2 py-0.5 rounded-full border border-accent/20">
-                   更新日期：{formattedUpdatedDate}
-                 </span>
-               )}
-             </h3>
-             <p class="text-sm text-text/60">週日休診，國定假日請見公告</p>
-           </div>
-        </div>
-        
-        <div class="bg-surface rounded-3xl p-6 md:p-10 shadow-sm border border-white/50">
-           {/* 表頭 */}
-           <div class="grid grid-cols-4 gap-4 mb-6 text-center">
-              <div class="text-text/40 font-bold text-sm flex items-center justify-center">
-                <Calendar size={16} />
-              </div>
-              <div class="text-primary font-bold text-sm bg-highlight/50 py-2 rounded-lg">早診 (09:00-12:00)</div>
-              <div class="text-primary font-bold text-sm bg-highlight/50 py-2 rounded-lg">午診 (14:30-17:30)</div>
-              <div class="text-primary font-bold text-sm bg-highlight/50 py-2 rounded-lg">夜診 (18:30-20:30)</div>
-           </div>
-           
-           {/* 表格內容 */}
-           <div class="space-y-3">
-              {displaySchedule.map((s) => (
-                 <div class="grid grid-cols-4 gap-4 items-center text-center group hover:bg-bg/50 rounded-xl transition-colors py-2 px-1">
-                    {/* 星期 */}
-                    <div class="font-bold text-primary text-sm group-hover:text-accent transition-colors">
-                      {s.day}
-                    </div>
-                    
-                    {/* 早診 */}
-                    <div class={`text-sm py-2 rounded-lg flex flex-col justify-center items-center transition-all ${getStatusClass(s.morning?.status)}`}>
-                       <span>{getStatusLabel(s.morning)}</span>
-                       {s.morning?.note && <span class="text-[0.6rem] opacity-70 mt-0.5 font-normal">{s.morning.note}</span>}
-                    </div>
-                    
-                    {/* 午診 */}
-                    <div class={`text-sm py-2 rounded-lg flex flex-col justify-center items-center transition-all ${getStatusClass(s.afternoon?.status)}`}>
-                       <span>{getStatusLabel(s.afternoon)}</span>
-                       {s.afternoon?.note && <span class="text-[0.6rem] opacity-70 mt-0.5 font-normal">{s.afternoon.note}</span>}
-                    </div>
-                    
-                    {/* 晚診 */}
-                    <div class={`text-sm py-2 rounded-lg flex flex-col justify-center items-center transition-all ${getStatusClass(s.evening?.status)}`}>
-                       <span>{getStatusLabel(s.evening)}</span>
-                       {s.evening?.note && <span class="text-[0.6rem] opacity-70 mt-0.5 font-normal">{s.evening.note}</span>}
-                    </div>
-                 </div>
-              ))}
-           </div>
-
-           <div class="mt-8 p-4 bg-highlight/30 rounded-xl border border-highlight/50 text-xs text-text/70 leading-relaxed flex gap-3">
-              <div class="mt-0.5 min-w-[16px] text-accent">!</div>
-              <p>
-                實際看診時間可能因會議或手術有所異動，建議看診前先透過電話或線上系統確認。
-              </p>
-           </div>
-        </div>
-      </div>
-
     </div>
+
+    {/* ── 下半部：交通與聯絡資訊 ── */}
+    <div>
+      <div class="mb-10 text-center">
+        <p
+          class="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-3 flex items-center justify-center gap-2"
+        >
+          <MapPin size={14} aria-hidden="true" /> LOCATION
+        </p>
+        <h2 class="text-3xl md:text-4xl font-serif font-bold text-primary">
+          交通與聯絡資訊
+        </h2>
+      </div>
+
+      <div
+        class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 max-w-6xl mx-auto items-stretch"
+      >
+        {/* 左欄：操作按鈕 + 地址與交通卡片 */}
+        <div class="flex flex-col gap-5">
+          {/* 快捷按鈕列 */}
+          <div class="grid grid-cols-2 gap-4">
+            {/* 撥打電話 */}
+            <a
+              href={clinicData.callLink}
+              aria-label={`撥打診所電話 ${clinicData.phone}`}
+              class="flex flex-col items-center justify-center text-center py-8 px-4 bg-primary text-white rounded-3xl shadow-lg hover:brightness-110 active:scale-95 transition-all duration-200 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
+              <Phone
+                size={36}
+                strokeWidth={2}
+                className="mb-3 opacity-90 group-hover:scale-110 transition-transform duration-200"
+                aria-hidden="true"
+              />
+              <span class="text-xl font-bold tracking-wide mb-1">撥打電話</span>
+              <span class="text-sm font-semibold opacity-85 tracking-wider"
+                >{clinicData.phone}</span
+              >
+            </a>
+
+            {/* Google 導航 */}
+            <a
+              href={clinicData.navigationLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="開啟 Google 地圖導航前往診所"
+              class="flex flex-col items-center justify-center text-center py-8 px-4 bg-white text-primary border-2 border-gray-200 rounded-3xl shadow-md hover:border-primary hover:shadow-xl active:scale-95 transition-all duration-200 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
+              <Navigation
+                size={36}
+                strokeWidth={2}
+                className="mb-3 text-primary group-hover:scale-110 transition-transform duration-200"
+                aria-hidden="true"
+              />
+              <span class="text-xl font-bold tracking-wide mb-1">Google</span>
+              <span
+                class="text-xl font-bold tracking-widest text-accent group-hover:text-primary transition-colors"
+                >導航前往</span
+              >
+            </a>
+          </div>
+
+          {/* 地址 + 交通資訊卡片 */}
+          <address
+            class="not-italic bg-white rounded-3xl p-6 sm:p-8 shadow-md border border-gray-100 flex-grow"
+          >
+            {/* 地址列 */}
+            <div class="flex items-start gap-4 mb-6">
+              <div
+                class="w-10 h-10 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-primary shrink-0 mt-0.5"
+                aria-hidden="true"
+              >
+                <MapPin size={20} strokeWidth={2.5} />
+              </div>
+              <div>
+                <h3
+                  class="text-xs font-bold text-text/40 uppercase tracking-widest mb-1.5"
+                >
+                  地址
+                </h3>
+                <p
+                  class="text-base sm:text-lg text-primary font-semibold leading-snug"
+                >
+                  {clinicData.address}
+                </p>
+              </div>
+            </div>
+
+            <div class="w-full h-px bg-gray-100 mb-6" aria-hidden="true"></div>
+
+            {/* 交通方式列 */}
+            <div class="flex items-start gap-4">
+              <div
+                class="w-10 h-10 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-primary shrink-0 mt-0.5"
+                aria-hidden="true"
+              >
+                <Bus size={20} strokeWidth={2.5} />
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3
+                  class="text-xs font-bold text-text/40 uppercase tracking-widest mb-4"
+                >
+                  交通方式
+                </h3>
+                <ul
+                  class="space-y-5 text-sm sm:text-[15px] text-text/80 leading-relaxed"
+                >
+                  {/* 捷運 */}
+                  <li class="flex items-start gap-3">
+                    <span
+                      class="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center shrink-0 mt-0.5"
+                      aria-hidden="true"
+                    >
+                      <Train
+                        size={14}
+                        strokeWidth={2.5}
+                        className="text-green-700"
+                      />
+                    </span>
+                    <p>
+                      <strong class="text-primary font-bold">捷運｜</strong>
+                      松山新店線 ／ 環狀線「大坪林站」1 號出口，出站後步行約 1 分鐘即可抵達。
+                    </p>
+                  </li>
+
+                  {/* 公車 */}
+                  <li class="flex items-start gap-3">
+                    <span
+                      class="w-7 h-7 rounded-full bg-orange-100 flex items-center justify-center shrink-0 mt-0.5"
+                      aria-hidden="true"
+                    >
+                      <Bus
+                        size={14}
+                        strokeWidth={2.5}
+                        className="text-orange-600"
+                      />
+                    </span>
+                    <p>
+                      <strong class="text-primary font-bold">公車｜</strong>
+                      「捷運大坪林站」或「民權路口」站下車，多線公車可達，步行數分鐘內可抵達。
+                    </p>
+                  </li>
+
+                  {/* 機車 */}
+                  <li class="flex items-start gap-3">
+                    <span
+                      class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center shrink-0 mt-0.5"
+                      aria-hidden="true"
+                    >
+                      <Bike
+                        size={14}
+                        strokeWidth={2.5}
+                        className="text-blue-600"
+                      />
+                    </span>
+                    <p>
+                      <strong class="text-primary font-bold">機車｜</strong>
+                      診所門前設有機車就診專用停車區，供來院患者使用。
+                    </p>
+                  </li>
+
+                  {/* 開車 */}
+                  <li class="flex items-start gap-3">
+                    <span
+                      class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center shrink-0 mt-0.5"
+                      aria-hidden="true"
+                    >
+                      <CarFront
+                        size={14}
+                        strokeWidth={2.5}
+                        className="text-gray-600"
+                      />
+                    </span>
+                    <div class="min-w-0">
+                      <p class="mb-3">
+                        <strong class="text-primary font-bold">開車｜</strong>
+                        周邊設有路邊停車格及收費停車場，建議停放於以下地點：
+                      </p>
+                      <ul
+                        class="space-y-2 text-[13px] sm:text-sm bg-gray-50 rounded-2xl p-4 border border-gray-100"
+                      >
+                        <li
+                          class="flex items-start gap-2.5 text-text/70 leading-normal"
+                        >
+                          <span
+                            class="w-1.5 h-1.5 rounded-full bg-accent mt-2 shrink-0"
+                            aria-hidden="true"></span>
+                          江陵禮停車場（新北市新店區民權路 67 號；入口位於玉山銀行旁）
+                        </li>
+                        <li
+                          class="flex items-start gap-2.5 text-text/70 leading-normal"
+                        >
+                          <span
+                            class="w-1.5 h-1.5 rounded-full bg-accent mt-2 shrink-0"
+                            aria-hidden="true"></span>
+                          Times 佳瑪新店店停車場（新北市新店區民權路 42 巷 59 弄 53
+                          號）
+                        </li>
+                      </ul>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </address>
+        </div>
+
+        {/* 右欄：滿版地圖 */}
+        <div
+          class="relative bg-white rounded-3xl overflow-hidden shadow-md border border-gray-100 min-h-[420px] lg:min-h-0 lg:h-auto"
+        >
+          {/* 放大地圖按鈕 */}
+          <a
+            href={clinicData.mapLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="在 Google 地圖中開啟診所位置"
+            class="absolute top-4 right-4 z-10 flex items-center gap-1.5 bg-white/95 backdrop-blur-sm text-primary px-3.5 py-2 rounded-xl text-xs font-bold shadow-lg border border-gray-100 hover:bg-primary hover:text-white transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            <Navigation size={13} aria-hidden="true" /> 放大地圖
+          </a>
+
+          <iframe
+            title={`${clinicData.name}位置地圖`}
+            src={clinicData.mapEmbedLink}
+            class="absolute inset-0 w-full h-full border-0"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen
+            aria-label={`${clinicData.name} Google 地圖`}></iframe>
+        </div>
+      </div>
+    </div>
+
+    {/* ── 停車場實景指引 ── */}
+    <div class="max-w-6xl mx-auto w-full pt-16">
+      <div class="mb-10 text-center">
+        <p class="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-3 flex items-center justify-center gap-2">
+          <CarFront size={14} aria-hidden="true" /> PARKING GUIDE
+        </p>
+        <h3 class="text-2xl md:text-3xl font-serif font-bold text-primary">
+          周邊收費停車場實景指引
+        </h3>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        {/* 江陵禮停車場 */}
+        <div class="bg-white rounded-3xl shadow-md border border-gray-100 overflow-hidden flex flex-col group hover:shadow-xl transition-all duration-300">
+          <div class="aspect-[4/3] overflow-hidden relative">
+            <Image src={BankImg} alt="江陵禮停車場入口" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+          </div>
+          <div class="p-5 sm:p-6 flex-1 flex flex-col justify-center">
+            <h4 class="font-bold text-primary text-lg mb-2">江陵禮停車場</h4>
+            <p class="text-sm text-text/70 leading-relaxed">
+              新北市新店區民權路 67 號<br/>
+              （入口位於玉山銀行旁）
+            </p>
+          </div>
+        </div>
+
+        {/* Times J-MART 停車場 1 */}
+        <div class="bg-white rounded-3xl shadow-md border border-gray-100 overflow-hidden flex flex-col group hover:shadow-xl transition-all duration-300">
+          <div class="aspect-[4/3] overflow-hidden relative">
+            <Image src={Jmart1Img} alt="Times J-MART 佳瑪新店店停車場外觀" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+          </div>
+          <div class="p-5 sm:p-6 flex-1 flex flex-col justify-center">
+            <h4 class="font-bold text-primary text-lg mb-2">Times J-MART 佳瑪新店店停車場</h4>
+            <p class="text-sm text-text/70 leading-relaxed">
+              新北市新店區民權路 42 巷 59 弄 53 號
+            </p>
+          </div>
+        </div>
+
+        {/* Times J-MART 停車場 2 */}
+        <div class="bg-white rounded-3xl shadow-md border border-gray-100 overflow-hidden flex flex-col group hover:shadow-xl transition-all duration-300">
+          <div class="aspect-[4/3] overflow-hidden relative">
+            <Image src={Jmart2Img} alt="Times J-MART 佳瑪新店店停車場入口" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+          </div>
+          <div class="p-5 sm:p-6 flex-1 flex flex-col justify-center">
+            <h4 class="font-bold text-primary text-lg mb-2">Times J-MART 佳瑪新店店停車場</h4>
+            <p class="text-sm text-text/70 leading-relaxed">
+              新北市新店區民權路 42 巷 59 弄 53 號
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* 停車場地圖總覽 */}
+      <div class="bg-white p-2 sm:p-4 rounded-3xl shadow-md border border-gray-100 mx-auto max-w-5xl group hover:shadow-xl transition-all duration-300">
+         <Image src={MapImg} alt="停車場位置總覽圖" class="w-full h-auto rounded-2xl"/>
+      </div>
+    </div>
+
   </div>
 </section>
