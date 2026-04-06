@@ -13,7 +13,6 @@ import markdoc from '@astrojs/markdoc';
 
 // https://astro.build/config
 export default defineConfig({
-  // 上線前記得改
 
   redirects: {
     '/admin': '/keystatic',
@@ -24,7 +23,11 @@ export default defineConfig({
     tailwind({
       applyBaseStyles: false // 🟢 建議：設為 false，避免 Tailwind 強制注入 base styles 影響後台
     }),
-    sitemap(),
+    sitemap({
+      filter: (page) =>
+        !page.includes('/test') &&
+        !page.includes('/keystatic'),
+    }),
     partytown({
       config: {
         forward: ["dataLayer.push"],
@@ -35,7 +38,7 @@ export default defineConfig({
     markdoc()],
 
 
-  site: 'https://drcmh-site-v2.pages.dev',
+  site: 'https://drcmh.com',
   output: 'server',
   adapter: cloudflare({
     // ✅ 最佳解：部署時壓縮圖片 (免費且高效)

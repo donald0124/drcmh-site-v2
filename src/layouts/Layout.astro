@@ -8,13 +8,17 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
+  noindex?: boolean;
 }
 
-// 預設 SEO 資訊 (從 PRD 提取)
+const GA4_ID = 'G-82JBBLX2LT';
+
+// 預設 SEO 資訊
 const { 
-  title = "周孟翰醫師 | 新店高美泌尿科診所院長",
+  title = "周孟翰醫師｜泌尿專科．下半身的守護者",
   description = "新店高美泌尿科診所院長周孟翰醫師，專精於攝護腺肥大微創手術、泌尿道結石、性功能障礙與私密處健康。提供隱私、專業且溫暖的診療服務。",
-  image = "/images/og-default.jpg" // 之後記得放一張預設分享圖在 public/images/
+  image = "/images/og-default.jpg",
+  noindex = false,
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -31,21 +35,34 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <!-- SEO Meta Tags -->
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="keywords" content="周孟翰醫師, 泌尿科, 下半身的守護者, 泌尿專科, 攝護腺, 泌尿道結石, 性功能障礙, 男性私密, 新店高美診所" />
     <link rel="canonical" href={canonicalURL} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
 
-    <!-- Open Graph / Facebook -->
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={Astro.url} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={new URL(image, Astro.site)} />
+    <meta property="og:locale" content="zh_TW" />
+    <meta property="og:site_name" content="周孟翰醫師｜泌尿專科．下半身的守護者" />
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content={Astro.url} />
-    <meta property="twitter:title" content={title} />
-    <meta property="twitter:description" content={description} />
-    <meta property="twitter:image" content={new URL(image, Astro.site)} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={Astro.url} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL(image, Astro.site)} />
+
+    <!-- GA4 (透過 Partytown 非同步，不阻塞渲染) -->
+    <script type="text/partytown" src={`https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`}></script>
+    <script type="text/partytown" define:vars={{ GA4_ID }}>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', GA4_ID);
+    </script>
 
     <!-- Google Fonts 引入 (Noto Serif TC + Noto Sans TC) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

@@ -1,4 +1,32 @@
+# 一般爬蟲
 User-agent: *
 Allow: /
+Disallow: /keystatic/
+Disallow: /api/
+Disallow: /test
 
-Sitemap: https://drcmh-site-v2.pages.dev/sitemap-index.xml
+# Google 延伸（用於 AI Overview / SGE）
+User-agent: Google-Extended
+Allow: /
+
+# ChatGPT / OpenAI
+User-agent: GPTBot
+Allow: /
+
+# Claude / Anthropic
+User-agent: ClaudeBot
+Allow: /
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+
+# Meta AI
+User-agent: Meta-ExternalAgent
+Allow: /
+
+# Common Crawl（AI 訓練資料來源）
+User-agent: CCBot
+Allow: /
+
+Sitemap: https://drcmh.com/sitemap-index.xml

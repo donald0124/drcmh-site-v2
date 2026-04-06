@@ -1,67 +1,100 @@
 ---
-import { ArrowRight, Activity, Award, Building2 } from 'lucide-react';
-import { Image } from 'astro:assets';
-import { getEntry } from 'astro:content';
-import doctorProfile from '../../assets/drchou-profile-2.png';
+import { ArrowRight, Activity, Award, Building2 } from "lucide-react";
+import { Image } from "astro:assets";
+import { getEntry } from "astro:content";
+import doctorProfile from "../../assets/drchou-profile-2.png";
 
 // 🟢 從 Keystatic 讀取全域設定
-const settings = await getEntry('settings', 'global');
-const { doctorName, doctorTitle, clinicName, currentHospitalPosition, slogan, heroIntro } = settings.data;
+const settings = await getEntry("settings", "global");
+const {
+  doctorName,
+  doctorTitle,
+  clinicName,
+  currentHospitalPosition,
+  slogan,
+  heroIntro,
+} = settings.data;
 
 // 文案資料
 const content = {
-  tag: "Dr. Chou Meng-Han",
+  tag: "泌尿外科專科醫師",
   name: "周孟翰",
   title: "醫師",
   subTitle: `${clinicName} ${doctorTitle}`,
   slogan: slogan || "讓難以啟齒的煩惱，變成輕鬆自在的日常",
-  intro: heroIntro || "在診間，沒有尷尬的提問，只有專業的傾聽。我們致力於透過細膩的溝通與精準的治療，協助您卸下心理負擔，重拾自信與舒適的生活步調。",
+  intro:
+    heroIntro ||
+    "在診間，沒有尷尬的提問，只有專業的傾聽。我們致力於透過細膩的溝通與精準的治療，協助您卸下心理負擔，重拾自信與舒適的生活步調。",
 };
 ---
 
-<section class="min-h-fit flex items-start md:items-center py-3 md:py-8 overflow-hidden bg-bg relative">
-  
+<section
+  class="min-h-fit flex items-start md:items-center py-3 md:py-8 overflow-hidden bg-bg relative"
+>
   {/* 1. 背景裝飾字 (UROLOGY) */}
-  <div class="absolute top-[10%] -left-12 md:left-0 text-[18vw] md:text-[15vw] font-serif font-bold text-primary/5 pointer-events-none select-none leading-none z-0">
+  <div
+    class="absolute top-[10%] -left-12 md:left-0 text-[18vw] md:text-[15vw] font-serif font-bold text-primary/5 pointer-events-none select-none leading-none z-0"
+  >
     UROLOGY
   </div>
 
   {/* 2. 背景裝飾色塊 */}
-  <div class="absolute top-0 right-0 w-2/3 h-full bg-gradient-to-l from-[#F0EBE3] to-transparent z-0 opacity-60"></div>
+  <div
+    class="absolute top-0 right-0 w-2/3 h-full bg-gradient-to-l from-[#F0EBE3] to-transparent z-0 opacity-60"
+  >
+  </div>
 
-  <div class="container mx-auto px-6 relative z-10 flex flex-col-reverse md:flex-row items-center gap-8 md:gap-0">
-    
+  <div
+    class="container mx-auto px-6 relative z-10 flex flex-col-reverse md:flex-row items-center gap-8 md:gap-0"
+  >
     {/* 3. 左側文字區塊 (Mobile: 下方, Desktop: 左側) */}
     <div class="w-full md:w-5/12 z-20 fade-in-up pb-12 md:pb-0">
-      
       {/* 標籤 */}
-      <div class="inline-block px-3 py-1 mb-6 border border-accent/50 rounded-full bg-white/50 backdrop-blur-sm">
-         <span class="text-xs font-bold tracking-[0.2em] uppercase text-accent">
-           {content.tag}
-         </span>
+      <div
+        class="inline-block px-3 py-1 mb-6 border border-accent/50 rounded-full bg-white/50 backdrop-blur-sm"
+      >
+        <span class="text-xs font-bold tracking-[0.2em] uppercase text-accent">
+          {content.tag}
+        </span>
       </div>
-      
+
       {/* 醫師姓名 */}
-      <h1 class="text-5xl md:text-6xl lg:text-7xl font-serif font-medium leading-tight mb-4 text-primary">
+      <h1
+        class="text-5xl md:text-6xl lg:text-7xl font-serif font-medium leading-tight mb-2 text-primary"
+      >
         {content.name}
-        <span class="text-3xl md:text-4xl block mt-2 text-text/60 font-sans font-normal">{content.title}</span>
+        <span
+          class="text-3xl md:text-4xl block mt-2 text-text/60 font-sans font-normal"
+          >{content.title}</span
+        >
       </h1>
-      
+      <p
+        class="text-sm md:text-base font-medium text-accent mb-4 tracking-wider"
+      >
+        泌尿專科．下半身的守護者
+      </p>
+
       {/* 分隔線 */}
       <div class="w-24 h-1 mb-8 bg-accent rounded-full"></div>
-      
+
       {/* 職稱 */}
-      <p class="text-lg md:text-xl font-medium mb-3 text-primary/80 flex items-center gap-3">
+      <p
+        class="text-lg md:text-xl font-medium mb-3 text-primary/80 flex items-center gap-3"
+      >
         <Award className="text-accent" size={20} />
         {content.subTitle}
       </p>
-      <p class="text-lg md:text-xl font-medium mb-6 text-text/70 flex items-center gap-3">
+      <p
+        class="text-lg md:text-xl font-medium mb-6 text-text/70 flex items-center gap-3"
+      >
         <Building2 className="text-accent shrink-0" size={20} />
         {currentHospitalPosition}
       </p>
       {/* Slogan & Intro */}
       <blockquote class="border-l-4 border-accent/30 pl-6 mb-8">
-        <p class="text-xl md:text-2xl font-serif text-primary mb-4 leading-snug">
+        <p
+          class="text-xl md:text-2xl font-serif text-primary mb-4 leading-snug"
+        >
           「{content.slogan}」
         </p>
         <p class="text-text leading-relaxed text-sm md:text-base text-justify">
@@ -71,35 +104,40 @@ const content = {
 
       {/* CTA 按鈕 */}
       <div class="flex gap-4">
-        <a 
-          href="/#clinic" 
+        <a
+          href="/#clinic"
           class="group flex items-center gap-3 px-8 py-4 bg-primary text-white rounded-full transition-all hover:bg-accent hover:shadow-lg hover:-translate-y-1"
         >
-           <span class="font-bold tracking-wide">預約門診</span>
-           <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform"/>
+          <span class="font-bold tracking-wide">查看門診資訊</span>
+          <ArrowRight
+            size={18}
+            className="group-hover:translate-x-1 transition-transform"
+          />
         </a>
       </div>
     </div>
 
     {/* 4. 右側醫師形象照區塊 (Mobile: 上方, Desktop: 右側) */}
     {/* 關鍵修改：移除 absolute 定位，改用 Flex 佈局讓圖片自然佔據空間 */}
-    <div class="w-full md:w-7/12 flex justify-center relative ">
-       
-       <div class="relative w-full max-w-lg md:max-w-xl aspect-[4/5] md:aspect-[4/5] z-10">
-          <div class="w-full h-full relative rounded-[2.5rem] overflow-hidden shadow-2xl bg-gradient-to-b from-[#E3Ddd5] to-[#F0EBE3] border-3 border-white">   
-             {/* 圖片容器：這裡使用 flex 讓圖片撐滿容器 */}
-             <div class="w-full h-full relative">
-                <Image 
-                  src={doctorProfile}
-                  alt="周孟翰醫師專業形象照" 
-                  class="w-full h-full object-cover object-top mask-image-gradient"
-                  loading="eager"
-                />
-             </div>
+    <div class="w-full md:w-7/12 flex justify-center relative">
+      <div
+        class="relative w-full max-w-lg md:max-w-xl aspect-[4/5] md:aspect-[4/5] z-10"
+      >
+        <div
+          class="w-full h-full relative rounded-[2.5rem] overflow-hidden shadow-2xl bg-gradient-to-b from-[#E3Ddd5] to-[#F0EBE3] border-3 border-white"
+        >
+          {/* 圖片容器：這裡使用 flex 讓圖片撐滿容器 */}
+          <div class="w-full h-full relative">
+            <Image
+              src={doctorProfile}
+              alt="周孟翰醫師專業形象照"
+              class="w-full h-full object-cover object-top mask-image-gradient"
+              loading="eager"
+            />
           </div>
-       </div>
+        </div>
+      </div>
     </div>
-
   </div>
 </section>
 
@@ -124,7 +162,12 @@ const content = {
   }
 
   @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
   }
 </style>

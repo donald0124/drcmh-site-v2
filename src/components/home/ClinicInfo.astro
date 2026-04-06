@@ -142,7 +142,7 @@ const getStatusClass = (status: string) => {
   if (status === "看診") return "text-accent font-bold bg-accent/10";
   if (status === "休診") return "text-text/20";
   if (status === "特約診") return "text-red-500 font-bold bg-red-100";
-  if (status === "手術日") return "text-blue-500 font-bold bg-blue-100";
+  if (status === "手術日") return "text-red-500 font-bold bg-red-100";
   if (status === "自訂") return "text-primary font-bold bg-gray-100";
   return "text-text/20";
 };
@@ -181,8 +181,9 @@ const getStatusClass = (status: string) => {
         </div>
 
         <div
-          class="bg-surface rounded-3xl p-6 sm:p-8 md:p-10 shadow-xl border border-white/80 space-y-8 flex-1 flex flex-col justify-center"
+          class="bg-surface rounded-3xl p-6 sm:p-8 md:p-10 shadow-xl border border-white/80 space-y-6 flex-1 flex flex-col"
         >
+          {/* 目前看診地點 */}
           <div class="flex items-start gap-4">
             <div
               class="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-primary shrink-0 mt-0.5"
@@ -211,6 +212,32 @@ const getStatusClass = (status: string) => {
 
           <div class="w-full h-px bg-gray-100" aria-hidden="true"></div>
 
+          {/* 電話 */}
+          <div class="flex items-start gap-4">
+            <div
+              class="w-12 h-12 rounded-2xl bg-green-50 border border-green-100 flex items-center justify-center text-green-700 shrink-0 mt-0.5"
+              aria-hidden="true"
+            >
+              <Phone size={24} strokeWidth={2.5} />
+            </div>
+            <div class="min-w-0 flex-1">
+              <h3
+                class="text-xs font-bold text-text/40 uppercase tracking-widest mb-1.5"
+              >
+                診所電話
+              </h3>
+              <a
+                href={clinicData.callLink}
+                class="text-xl md:text-2xl font-bold text-primary hover:text-accent transition-colors"
+              >
+                {clinicData.phone}
+              </a>
+            </div>
+          </div>
+
+          <div class="w-full h-px bg-gray-100" aria-hidden="true"></div>
+
+          {/* Email */}
           <div class="flex items-start gap-4">
             <div
               class="w-12 h-12 rounded-2xl bg-highlight/50 border border-highlight flex items-center justify-center text-accent shrink-0 mt-0.5"
@@ -237,6 +264,35 @@ const getStatusClass = (status: string) => {
                 )
               }
             </div>
+          </div>
+
+          <div class="w-full h-px bg-gray-100" aria-hidden="true"></div>
+
+          {/* 就診前須知 */}
+          <div class="flex-1 flex flex-col justify-end space-y-3">
+            <h3
+              class="text-md font-bold text-text/40 uppercase tracking-widest"
+            >
+              就診前須知
+            </h3>
+            <ul class="space-y-2.5">
+              {
+                [
+                  "初診請提前 10 分鐘報到，並攜帶健保卡",
+                  "如需取消或改期，請提前來電告知",
+                  "實際看診時間可能因手術有所異動",
+                  "隱私保密，所有就診資料嚴格保護",
+                ].map((item) => (
+                  <li class="flex items-start gap-2.5 text-md text-text/70 leading-relaxed">
+                    <span
+                      class="w-1.5 h-1.5 rounded-full bg-accent mt-2 shrink-0"
+                      aria-hidden="true"
+                    />
+                    {item}
+                  </li>
+                ))
+              }
+            </ul>
           </div>
         </div>
       </div>
@@ -278,26 +334,23 @@ const getStatusClass = (status: string) => {
               <Calendar size={18} />
             </div>
             <div
-              class="text-primary font-bold text-xs sm:text-sm bg-highlight/50 py-2.5 rounded-xl leading-tight"
+              class="text-primary font-bold text-sm sm:text-sm bg-highlight/50 py-2.5 rounded-xl leading-tight"
             >
-              早診<span
-                class="block text-[0.65rem] font-normal opacity-70 mt-0.5"
+              早診<span class="block text-sm font-normal opacity-100 mt-0.5"
                 >09:00–12:00</span
               >
             </div>
             <div
-              class="text-primary font-bold text-xs sm:text-sm bg-highlight/50 py-2.5 rounded-xl leading-tight"
+              class="text-primary font-bold text-sm sm:text-sm bg-highlight/50 py-2.5 rounded-xl leading-tight"
             >
-              午診<span
-                class="block text-[0.65rem] font-normal opacity-70 mt-0.5"
+              午診<span class="block text-sm font-normal opacity-100 mt-0.5"
                 >14:30–17:30</span
               >
             </div>
             <div
-              class="text-primary font-bold text-xs sm:text-sm bg-highlight/50 py-2.5 rounded-xl leading-tight"
+              class="text-primary font-bold text-sm sm:text-sm bg-highlight/50 py-2.5 rounded-xl leading-tight"
             >
-              夜診<span
-                class="block text-[0.65rem] font-normal opacity-70 mt-0.5"
+              夜診<span class="block text-sm font-normal opacity-100 mt-0.5"
                 >18:30–20:30</span
               >
             </div>
@@ -603,36 +656,52 @@ const getStatusClass = (status: string) => {
     {/* ── 停車場實景指引 ── */}
     <div class="max-w-6xl mx-auto w-full pt-16">
       <div class="mb-10 text-center">
-        <p class="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-3 flex items-center justify-center gap-2">
+        <p
+          class="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-3 flex items-center justify-center gap-2"
+        >
           <CarFront size={14} aria-hidden="true" /> PARKING GUIDE
         </p>
         <h3 class="text-2xl md:text-3xl font-serif font-bold text-primary">
           周邊收費停車場實景指引
         </h3>
       </div>
-      
+
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         {/* 江陵禮停車場 */}
-        <div class="bg-white rounded-3xl shadow-md border border-gray-100 overflow-hidden flex flex-col group hover:shadow-xl transition-all duration-300">
+        <div
+          class="bg-white rounded-3xl shadow-md border border-gray-100 overflow-hidden flex flex-col group hover:shadow-xl transition-all duration-300"
+        >
           <div class="aspect-[4/3] overflow-hidden relative">
-            <Image src={BankImg} alt="江陵禮停車場入口" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+            <Image
+              src={BankImg}
+              alt="江陵禮停車場入口"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
           </div>
           <div class="p-5 sm:p-6 flex-1 flex flex-col justify-center">
             <h4 class="font-bold text-primary text-lg mb-2">江陵禮停車場</h4>
             <p class="text-sm text-text/70 leading-relaxed">
-              新北市新店區民權路 67 號<br/>
+              新北市新店區民權路 67 號<br />
               （入口位於玉山銀行旁）
             </p>
           </div>
         </div>
 
         {/* Times J-MART 停車場 1 */}
-        <div class="bg-white rounded-3xl shadow-md border border-gray-100 overflow-hidden flex flex-col group hover:shadow-xl transition-all duration-300">
+        <div
+          class="bg-white rounded-3xl shadow-md border border-gray-100 overflow-hidden flex flex-col group hover:shadow-xl transition-all duration-300"
+        >
           <div class="aspect-[4/3] overflow-hidden relative">
-            <Image src={Jmart1Img} alt="Times J-MART 佳瑪新店店停車場外觀" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+            <Image
+              src={Jmart1Img}
+              alt="Times J-MART 佳瑪新店店停車場外觀"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
           </div>
           <div class="p-5 sm:p-6 flex-1 flex flex-col justify-center">
-            <h4 class="font-bold text-primary text-lg mb-2">Times J-MART 佳瑪新店店停車場</h4>
+            <h4 class="font-bold text-primary text-lg mb-2">
+              Times J-MART 佳瑪新店店停車場
+            </h4>
             <p class="text-sm text-text/70 leading-relaxed">
               新北市新店區民權路 42 巷 59 弄 53 號
             </p>
@@ -640,12 +709,20 @@ const getStatusClass = (status: string) => {
         </div>
 
         {/* Times J-MART 停車場 2 */}
-        <div class="bg-white rounded-3xl shadow-md border border-gray-100 overflow-hidden flex flex-col group hover:shadow-xl transition-all duration-300">
+        <div
+          class="bg-white rounded-3xl shadow-md border border-gray-100 overflow-hidden flex flex-col group hover:shadow-xl transition-all duration-300"
+        >
           <div class="aspect-[4/3] overflow-hidden relative">
-            <Image src={Jmart2Img} alt="Times J-MART 佳瑪新店店停車場入口" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+            <Image
+              src={Jmart2Img}
+              alt="Times J-MART 佳瑪新店店停車場入口"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
           </div>
           <div class="p-5 sm:p-6 flex-1 flex flex-col justify-center">
-            <h4 class="font-bold text-primary text-lg mb-2">Times J-MART 佳瑪新店店停車場</h4>
+            <h4 class="font-bold text-primary text-lg mb-2">
+              Times J-MART 佳瑪新店店停車場
+            </h4>
             <p class="text-sm text-text/70 leading-relaxed">
               新北市新店區民權路 42 巷 59 弄 53 號
             </p>
@@ -654,10 +731,15 @@ const getStatusClass = (status: string) => {
       </div>
 
       {/* 停車場地圖總覽 */}
-      <div class="bg-white p-2 sm:p-4 rounded-3xl shadow-md border border-gray-100 mx-auto max-w-5xl group hover:shadow-xl transition-all duration-300">
-         <Image src={MapImg} alt="停車場位置總覽圖" class="w-full h-auto rounded-2xl"/>
+      <div
+        class="bg-white p-2 sm:p-4 rounded-3xl shadow-md border border-gray-100 mx-auto max-w-5xl group hover:shadow-xl transition-all duration-300"
+      >
+        <Image
+          src={MapImg}
+          alt="停車場位置總覽圖"
+          class="w-full h-auto rounded-2xl"
+        />
       </div>
     </div>
-
   </div>
 </section>

@@ -4,8 +4,7 @@ weeklySchedule:
     morning:
       status: 看診
     afternoon:
-      status: 特約診
-      customLabel: (手術)
+      status: 手術日
     evening:
       status: 看診
   - day: 週二
