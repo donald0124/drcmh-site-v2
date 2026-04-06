@@ -21,19 +21,38 @@ const callLink = `tel:${phone.replace(/[\s\-()]/g, '')}`;
     <div class="max-w-lg w-full text-center space-y-8">
 
       {/* 圖示 */}
-      <div class="mx-auto w-24 h-24 rounded-full bg-highlight/60 border-2 border-accent/20 flex items-center justify-center animate-pulse-slow">
-        <Construction size={44} className="text-accent" />
+      <div class="mx-auto w-24 h-24 rounded-full bg-amber-50 border-2 border-amber-300 flex items-center justify-center animate-pulse-slow">
+        <Construction size={44} className="text-amber-500" />
       </div>
 
       {/* 標題 */}
-      <h1 class="text-3xl md:text-4xl font-serif font-bold text-primary leading-tight">
-        線上預約掛號系統<br/>建置中
-      </h1>
+      <div>
+        <h1 class="text-3xl md:text-4xl font-serif font-bold text-primary leading-tight mb-3">
+          門診尚未開始
+        </h1>
+        <p class="text-accent font-bold text-base tracking-wide">預計 4 月底正式開診</p>
+      </div>
+
+      {/* 說明卡片 */}
+      <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-left space-y-3">
+        <p class="font-bold text-amber-900 text-sm">目前兩處門診皆尚未開診：</p>
+        <ul class="space-y-2 text-sm text-amber-800">
+          <li class="flex items-start gap-2">
+            <span class="text-amber-500 font-black shrink-0 mt-0.5">🚧</span>
+            <span><strong>新店高美泌尿科診所</strong>｜籌備中，預計 4 月底開始營運</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-amber-500 font-black shrink-0 mt-0.5">🚧</span>
+            <span><strong>三軍總醫院汀洲院區</strong>｜診次尚未排定，請留意公告</span>
+          </li>
+        </ul>
+        <p class="text-amber-700 text-xs pt-1">開診日期確定後將於首頁公告，敬請期待。</p>
+      </div>
 
       {/* 說明文字 */}
-      <p class="text-text/70 text-lg leading-relaxed">
+      <p class="text-text/70 text-base leading-relaxed">
         造成不便，敬請見諒。<br/>
-        目前歡迎直接來電諮詢或預約。
+        如有急迫就醫需求，歡迎來電諮詢。
       </p>
 
       {/* 電話按鈕 */}
@@ -51,7 +70,7 @@ const callLink = `tel:${phone.replace(/[\s\-()]/g, '')}`;
           href="/#clinic"
           class="inline-flex items-center gap-2 text-sm font-bold text-accent hover:text-primary transition-colors group"
         >
-          查看門診與交通資訊
+          查看門診與交通資訊（預覽）
           <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
         </a>
       </div>

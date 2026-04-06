@@ -163,6 +163,24 @@ const getStatusClass = (status: string) => {
   <div
     class="container mx-auto px-4 sm:px-6 relative z-10 space-y-24 lg:space-y-28"
   >
+    {/* ── 🔴 開幕時刪除 START ── 籌備中公告橫幅 ── */}
+    <div class="max-w-6xl mx-auto w-full">
+      <div
+        class="flex items-center gap-4 bg-amber-50 border border-amber-300 rounded-2xl px-6 py-4 shadow-sm"
+      >
+        <span class="text-2xl shrink-0" aria-hidden="true">🚧</span>
+        <div>
+          <p class="font-bold text-amber-900 text-base leading-snug">
+            新店高美泌尿科診所預計 4 月底開始營運，目前尚未開診
+          </p>
+          <p class="text-amber-700 text-sm mt-0.5">
+            汀洲三總門診亦尚未開診，以下資訊僅供預覽參考，實際開診日期請留意首頁公告。
+          </p>
+        </div>
+      </div>
+    </div>
+    {/* ── 🔴 開幕時刪除 END ── 籌備中公告橫幅 ── */}
+
     {/* ── 上半部：駐診與門診時刻表 ── */}
     <div
       class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 max-w-6xl mx-auto w-full items-stretch"
@@ -178,8 +196,21 @@ const getStatusClass = (status: string) => {
           <h2 class="text-3xl md:text-4xl font-serif font-bold text-primary">
             門診與聯絡資訊
           </h2>
+            {/* ── 🔴 開幕時刪除 START ── 交通資訊「籌備中」標註 ── */}
+            <div class="flex items-center justify-center gap-2 bg-amber-50 border border-amber-300 rounded-xl px-5 py-2.5 mt-4 shadow-sm mx-auto max-w-xl">
+              <span class="text-lg shrink-0" aria-hidden="true">🚧</span>
+              <p class="text-sm font-bold text-amber-900 leading-snug">診所籌備中 — 開診依實際公告為準</p>
+            </div>
+            {/* ── 🔴 開幕時刪除 END ── 交通資訊「籌備中」標註 ── */}
         </div>
 
+        <!-- <div class="relative flex-1 flex flex-col">
+          {/* 籌備中遮罩 */}
+          <div class="absolute inset-0 z-20 rounded-3xl bg-white/75 backdrop-blur-[3px] flex flex-col items-center justify-center gap-3 pointer-events-none" aria-hidden="true">
+            <span class="text-4xl">🚧</span>
+            <p class="font-bold text-primary text-lg text-center leading-snug px-6">診所籌備中</p>
+            <p class="text-text/60 text-sm text-center px-8">預計 4 月底開始營運</p>
+          </div> -->
         <div
           class="bg-surface rounded-3xl p-6 sm:p-8 md:p-10 shadow-xl border border-white/80 space-y-6 flex-1 flex flex-col"
         >
@@ -192,10 +223,11 @@ const getStatusClass = (status: string) => {
               <MapPin size={24} strokeWidth={2.5} />
             </div>
             <div>
+              {/* 🔴 開幕時：將「未來開診地點」改為「目前看診地點」 */}
               <h3
                 class="text-xs font-bold text-text/40 uppercase tracking-widest mb-1.5"
               >
-                目前看診地點
+                未來開診地點
               </h3>
               <p
                 class="text-xl md:text-2xl font-bold text-primary leading-tight"
@@ -295,6 +327,7 @@ const getStatusClass = (status: string) => {
             </ul>
           </div>
         </div>
+        <!-- </div>{/* end relative wrapper 門診聯絡 */} -->
       </div>
 
       {/* 右欄：門診時刻表 */}
@@ -322,102 +355,121 @@ const getStatusClass = (status: string) => {
           </p>
         </div>
 
-        <div
-          class="bg-surface rounded-3xl p-5 sm:p-8 md:p-10 shadow-xl border border-white/80 flex-1 flex flex-col"
-        >
-          {/* 表頭 */}
-          <div class="grid grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6 text-center">
-            <div
-              class="text-text/40 font-bold text-sm flex items-center justify-center bg-gray-50/50 rounded-xl py-2"
-              aria-hidden="true"
-            >
-              <Calendar size={18} />
-            </div>
-            <div
-              class="text-primary font-bold text-sm sm:text-sm bg-highlight/50 py-2.5 rounded-xl leading-tight"
-            >
-              早診<span class="block text-sm font-normal opacity-100 mt-0.5"
-                >09:00–12:00</span
-              >
-            </div>
-            <div
-              class="text-primary font-bold text-sm sm:text-sm bg-highlight/50 py-2.5 rounded-xl leading-tight"
-            >
-              午診<span class="block text-sm font-normal opacity-100 mt-0.5"
-                >14:30–17:30</span
-              >
-            </div>
-            <div
-              class="text-primary font-bold text-sm sm:text-sm bg-highlight/50 py-2.5 rounded-xl leading-tight"
-            >
-              夜診<span class="block text-sm font-normal opacity-100 mt-0.5"
-                >18:30–20:30</span
-              >
-            </div>
-          </div>
-
-          {/* 表格列 */}
+        <div class="relative flex-1 flex flex-col">
+          {/* 籌備中遮罩 */}
           <div
-            class="space-y-2 sm:space-y-3 flex-1"
-            role="list"
-            aria-label="每週門診時刻"
+            class="absolute inset-0 z-20 rounded-3xl bg-white/75 backdrop-blur-[3px] flex flex-col items-center justify-center gap-3 pointer-events-none"
+            aria-hidden="true"
           >
-            {
-              displaySchedule.map((s) => (
-                <div
-                  class="grid grid-cols-4 gap-2 sm:gap-4 items-center text-center group hover:bg-highlight/20 rounded-xl transition-colors py-2 px-1"
-                  role="listitem"
-                >
-                  <div class="font-bold text-primary text-sm sm:text-base group-hover:text-accent transition-colors">
-                    {s.day}
-                  </div>
-                  <div
-                    class={`text-xs sm:text-sm py-2 sm:py-3 rounded-xl flex flex-col justify-center items-center transition-all ${getStatusClass(s.morning?.status)}`}
-                  >
-                    <span>{getStatusLabel(s.morning)}</span>
-                    {s.morning?.note && (
-                      <span class="text-[0.6rem] opacity-80 mt-0.5 font-normal leading-tight">
-                        {s.morning.note}
-                      </span>
-                    )}
-                  </div>
-                  <div
-                    class={`text-xs sm:text-sm py-2 sm:py-3 rounded-xl flex flex-col justify-center items-center transition-all ${getStatusClass(s.afternoon?.status)}`}
-                  >
-                    <span>{getStatusLabel(s.afternoon)}</span>
-                    {s.afternoon?.note && (
-                      <span class="text-[0.6rem] opacity-80 mt-0.5 font-normal leading-tight">
-                        {s.afternoon.note}
-                      </span>
-                    )}
-                  </div>
-                  <div
-                    class={`text-xs sm:text-sm py-2 sm:py-3 rounded-xl flex flex-col justify-center items-center transition-all ${getStatusClass(s.evening?.status)}`}
-                  >
-                    <span>{getStatusLabel(s.evening)}</span>
-                    {s.evening?.note && (
-                      <span class="text-[0.6rem] opacity-80 mt-0.5 font-normal leading-tight">
-                        {s.evening.note}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))
-            }
-          </div>
-
-          <div
-            class="mt-8 p-4 bg-highlight/30 rounded-xl border border-highlight/50 text-sm text-text/70 leading-relaxed flex gap-3 mt-auto"
-          >
-            <span
-              class="text-accent font-black shrink-0 mt-0.5"
-              aria-hidden="true">!</span
+            <span class="text-4xl">🚧</span>
+            <p
+              class="font-bold text-primary text-lg text-center leading-snug px-6"
             >
-            <p>
-              實際看診時間可能因會議或手術有所異動，建議來院前先透過電話確認。
+              尚未開診
+            </p>
+            <p class="text-text/60 text-sm text-center px-8">
+              門診時刻表將於開診前公告
             </p>
           </div>
-        </div>
+          <div
+            class="bg-surface rounded-3xl p-5 sm:p-8 md:p-10 shadow-xl border border-white/80 flex-1 flex flex-col"
+          >
+            {/* 表頭 */}
+            <div
+              class="grid grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6 text-center"
+            >
+              <div
+                class="text-text/40 font-bold text-sm flex items-center justify-center bg-gray-50/50 rounded-xl py-2"
+                aria-hidden="true"
+              >
+                <Calendar size={18} />
+              </div>
+              <div
+                class="text-primary font-bold text-sm sm:text-sm bg-highlight/50 py-2.5 rounded-xl leading-tight"
+              >
+                早診<span class="block text-sm font-normal opacity-100 mt-0.5"
+                  >09:00–12:00</span
+                >
+              </div>
+              <div
+                class="text-primary font-bold text-sm sm:text-sm bg-highlight/50 py-2.5 rounded-xl leading-tight"
+              >
+                午診<span class="block text-sm font-normal opacity-100 mt-0.5"
+                  >14:30–17:30</span
+                >
+              </div>
+              <div
+                class="text-primary font-bold text-sm sm:text-sm bg-highlight/50 py-2.5 rounded-xl leading-tight"
+              >
+                夜診<span class="block text-sm font-normal opacity-100 mt-0.5"
+                  >18:30–20:30</span
+                >
+              </div>
+            </div>
+
+            {/* 表格列 */}
+            <div
+              class="space-y-2 sm:space-y-3 flex-1"
+              role="list"
+              aria-label="每週門診時刻"
+            >
+              {
+                displaySchedule.map((s) => (
+                  <div
+                    class="grid grid-cols-4 gap-2 sm:gap-4 items-center text-center group hover:bg-highlight/20 rounded-xl transition-colors py-2 px-1"
+                    role="listitem"
+                  >
+                    <div class="font-bold text-primary text-sm sm:text-base group-hover:text-accent transition-colors">
+                      {s.day}
+                    </div>
+                    <div
+                      class={`text-xs sm:text-sm py-2 sm:py-3 rounded-xl flex flex-col justify-center items-center transition-all ${getStatusClass(s.morning?.status)}`}
+                    >
+                      <span>{getStatusLabel(s.morning)}</span>
+                      {s.morning?.note && (
+                        <span class="text-[0.6rem] opacity-80 mt-0.5 font-normal leading-tight">
+                          {s.morning.note}
+                        </span>
+                      )}
+                    </div>
+                    <div
+                      class={`text-xs sm:text-sm py-2 sm:py-3 rounded-xl flex flex-col justify-center items-center transition-all ${getStatusClass(s.afternoon?.status)}`}
+                    >
+                      <span>{getStatusLabel(s.afternoon)}</span>
+                      {s.afternoon?.note && (
+                        <span class="text-[0.6rem] opacity-80 mt-0.5 font-normal leading-tight">
+                          {s.afternoon.note}
+                        </span>
+                      )}
+                    </div>
+                    <div
+                      class={`text-xs sm:text-sm py-2 sm:py-3 rounded-xl flex flex-col justify-center items-center transition-all ${getStatusClass(s.evening?.status)}`}
+                    >
+                      <span>{getStatusLabel(s.evening)}</span>
+                      {s.evening?.note && (
+                        <span class="text-[0.6rem] opacity-80 mt-0.5 font-normal leading-tight">
+                          {s.evening.note}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))
+              }
+            </div>
+
+            <div
+              class="mt-8 p-4 bg-highlight/30 rounded-xl border border-highlight/50 text-sm text-text/70 leading-relaxed flex gap-3 mt-auto"
+            >
+              <span
+                class="text-accent font-black shrink-0 mt-0.5"
+                aria-hidden="true">!</span
+              >
+              <p>
+                實際看診時間可能因會議或手術有所異動，建議來院前先透過電話確認。
+              </p>
+            </div>
+          </div>
+        </div>{/* end relative wrapper 門診時刻 */}
       </div>
     </div>
 
@@ -432,6 +484,12 @@ const getStatusClass = (status: string) => {
         <h2 class="text-3xl md:text-4xl font-serif font-bold text-primary">
           交通與聯絡資訊
         </h2>
+        {/* ── 🔴 開幕時刪除 START ── 交通資訊「籌備中」標註 ── */}
+        <div class="flex items-center justify-center gap-2 bg-amber-50 border border-amber-300 rounded-xl px-5 py-2.5 mt-4 shadow-sm mx-auto max-w-xl">
+          <span class="text-lg shrink-0" aria-hidden="true">🚧</span>
+          <p class="text-sm font-bold text-amber-900 leading-snug">診所籌備中 — 地址及交通資訊僅供預覽參考</p>
+        </div>
+        {/* ── 🔴 開幕時刪除 END ── 交通資訊「籌備中」標註 ── */}
       </div>
 
       <div
