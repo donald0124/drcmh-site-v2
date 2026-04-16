@@ -1,4 +1,4 @@
-lastUpdated: 2026-03-28
+lastUpdated: 2026-04-17
 weeklySchedule:
   - day: 週一
     morning:
@@ -13,6 +13,7 @@ weeklySchedule:
     afternoon:
       status: 自訂
       customLabel: 三總汀州門診
+      note: 5月起開診
     evening:
       status: 看診
   - day: 週三
