@@ -2,6 +2,7 @@
 export const prerender = true;
 import { getCollection, render } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
+import ShareButtons from '../../components/common/ShareButtons.astro';
 import { Image } from 'astro:assets';
 
 // 1. 生成靜態路徑 (Static Paths)
@@ -104,15 +105,7 @@ const currentCat = categoryStyles[post.data.category] || { label: '公告', clas
           返回消息列表
         </a>
         
-        <div class="flex items-center gap-4">
-           <span class="text-sm text-gray-400 font-medium">分享此消息：</span>
-           <button class="w-10 h-10 rounded-full bg-gray-50 text-gray-400 hover:bg-[#06C755] hover:text-white transition-all">
-             <i class="fa-brands fa-line text-lg"></i>
-           </button>
-           <button class="w-10 h-10 rounded-full bg-gray-50 text-gray-400 hover:bg-[#1877F2] hover:text-white transition-all">
-             <i class="fa-brands fa-facebook text-lg"></i>
-           </button>
-        </div>
+        <ShareButtons title={post.data.title} url={Astro.url.href} label="分享此消息：" />
       </div>
     </div>
   </article>

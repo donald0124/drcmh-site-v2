@@ -1,0 +1,57 @@
+---
+interface Props {
+  title: string;
+  url: string;
+  label?: string;
+}
+
+const { title, url, label = '分享：' } = Astro.props;
+const encodedUrl = encodeURIComponent(url);
+const encodedTitle = encodeURIComponent(title);
+---
+
+<div class="flex items-center gap-3">
+  <span class="text-sm text-gray-400 font-medium">{label}</span>
+
+  <a
+    href={`https://social-plugins.line.me/lineit/share?url=${encodedUrl}`}
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="分享到 LINE"
+    class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-50 text-gray-400 hover:bg-[#06C755] hover:text-white transition-all"
+  >
+    <i class="fa-brands fa-line text-lg"></i>
+  </a>
+
+  <a
+    href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="分享到 Facebook"
+    class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-50 text-gray-400 hover:bg-[#1877F2] hover:text-white transition-all"
+  >
+    <i class="fa-brands fa-facebook text-lg"></i>
+  </a>
+
+  <button
+    data-share-title={title}
+    data-share-url={url}
+    aria-label="更多分享方式"
+    class="share-native-btn flex items-center justify-center w-10 h-10 rounded-full bg-gray-50 text-gray-400 hover:bg-primary hover:text-white transition-all"
+  >
+    <i class="fa-solid fa-share-nodes text-lg"></i>
+  </button>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('.share-native-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (navigator.share) {
+        navigator.share({
+          title: btn.dataset.shareTitle,
+          url: btn.dataset.shareUrl,
+        });
+      }
+    });
+  });
+</script>
