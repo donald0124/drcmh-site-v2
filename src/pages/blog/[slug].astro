@@ -7,6 +7,7 @@ import Footer from "../../components/common/Footer.astro";
 import Sidebar from "../../components/blog/Sidebar.astro";
 import TableOfContents from "../../components/blog/TableOfContents.astro";
 import BlogCard from "../../components/blog/BlogCard.astro";
+import ShareButtons from "../../components/common/ShareButtons.astro";
 import { Image } from "astro:assets";
 import { Calendar, User, Clock, List } from "lucide-react";
 
@@ -233,7 +234,7 @@ const readTime = Math.ceil((post.body?.length || 0) / 500);
           </div>
 
           {/* 回到文章列表按鈕 */}
-          <div class="mt-8 flex justify-center">
+          <div class="mt-8 flex flex-col items-center gap-4">
             <a
               href="/blog"
               class="inline-flex items-center gap-2 px-6 py-2 rounded-full border border-gray-300 text-text/70 hover:bg-gray-100 hover:text-primary transition-all text-sm font-bold"
@@ -241,6 +242,7 @@ const readTime = Math.ceil((post.body?.length || 0) / 500);
               <i class="fa-solid fa-arrow-left"></i>
               回到文章列表
             </a>
+            <ShareButtons title={post.data.title} url={Astro.url.href} />
           </div>
         </div>
 
