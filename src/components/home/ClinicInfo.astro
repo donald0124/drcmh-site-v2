@@ -204,16 +204,22 @@ const getStatusClass = (status: string) => {
               >
                 目前看診地點
               </h3>
-              <p
-                class="text-xl md:text-2xl font-bold text-primary leading-tight"
-              >
-                {clinicData.name}
-              </p>
-              <p
-                class="text-xl md:text-2xl font-bold text-primary leading-tight"
-              >
-                三軍總醫院汀州院區
-              </p>
+              <div class="flex items-center gap-2 flex-wrap">
+                <p class="text-xl md:text-2xl font-bold text-primary leading-tight">
+                  {clinicData.name}
+                </p>
+                <span class="text-[11px] font-black px-2 py-0.5 rounded-full bg-accent text-white whitespace-nowrap">
+                  4/20 開診
+                </span>
+              </div>
+              <div class="flex items-center gap-2 flex-wrap mt-1">
+                <p class="text-xl md:text-2xl font-bold text-primary leading-tight">
+                  三軍總醫院汀州院區
+                </p>
+                <span class="text-[11px] font-black px-2 py-0.5 rounded-full bg-primary/80 text-white whitespace-nowrap">
+                  5 月起開診
+                </span>
+              </div>
             </div>
           </div>
 
@@ -317,6 +323,9 @@ const getStatusClass = (status: string) => {
             class="text-3xl md:text-4xl font-serif font-bold text-primary flex flex-col sm:flex-row items-start lg:items-center justify-start lg:justify-center gap-3"
           >
             門診時刻表
+            <span class="text-[11px] font-black px-2 py-1 rounded-full bg-accent text-white whitespace-nowrap self-start sm:self-auto">
+              4/20 起
+            </span>
             {
               formattedUpdatedDate && (
                 <span class="text-[0.65rem] font-normal leading-none bg-accent/10 text-accent px-3 py-1.5 rounded-full border border-accent/20 shadow-sm mt-1 sm:mt-0">
