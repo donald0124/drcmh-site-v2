@@ -1,0 +1,16 @@
+---
+import FacebookFeed from './FacebookFeed.jsx';
+---
+
+<section class="py-16 bg-bg">
+  <div class="container mx-auto px-6">
+    <div class="text-center mb-10">
+      <p class="text-xs font-bold tracking-[0.2em] uppercase text-accent">社群動態</p>
+      <h2 class="text-3xl md:text-4xl font-serif font-bold text-primary mt-2">Facebook粉專最新貼文</h2>
+      <p class="text-text/70 mt-3 text-sm">追蹤我們的粉絲專頁，掌握診所最新消息</p>
+    </div>
+    <div class="w-full max-w-[680px] mx-auto">
+      <FacebookFeed client:visible />
+    </div>
+  </div>
+</section>
