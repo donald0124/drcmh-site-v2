@@ -39,9 +39,11 @@ function formatDate(date: Date) {
   });
 }
 
-// 簡單的摘要擷取函式 (去除 Markdown 符號)
+// 簡單的摘要擷取函式 (去除 Markdown 符號與 HTML Entity)
 function getExcerpt(body: string) {
   return body
+    .replace(/<[^>]*>?/gm, '') // 去除 HTML tag
+    .replace(/&[#A-Za-z0-9]+;/gm, ' ') // 替換 HTML Entity 為空白 (例如 &#x20;, &nbsp; 等)
     .replace(/[#*`]/g, '') // 去除 Markdown 符號
     .substring(0, 80) + '...'; // 取前 80 字
 }
