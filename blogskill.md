@@ -102,7 +102,7 @@ advanced:
 
 ---
 
-## 六、發布前 Checklist
+## 六、發布前 Checklistblo
 
 ```
 □ title          已填寫，20–40 字，包含核心關鍵字
@@ -130,3 +130,28 @@ advanced:
 | 治療比較 | `[治療A] vs [治療B]：[比較重點] \| 周孟翰醫師` | `UroLift vs Rezūm：微創手術如何選擇 \| 周孟翰醫師` |
 | 症狀說明 | `[症狀]是什麼原因？[解決方向] \| 周孟翰醫師` | `頻尿夜尿是什麼原因？攝護腺肥大完整說明 \| 周孟翰醫師` |
 | 預防衛教 | `[疾病]如何預防？[關鍵建議] \| 周孟翰醫師` | `HPV 感染如何預防？疫苗接種時機完整說明 \| 周孟翰醫師` |
+
+
+
+
+建議 2：加入 <link rel="preload"> 給首圖
+問題： Hero 區的醫師照片是 LCP（Largest Contentful Paint）元素，但沒有 preload 指示。
+
+建議： 在 <head> 加入：
+
+
+<link rel="preload" as="image" href={doctorProfile.src} />
+建議 3：OG 圖片尺寸 meta 補充
+問題： Open Graph 圖片未宣告尺寸，部分平台會重新下載圖片確認尺寸。
+
+建議補充：
+
+
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:type" content="image/jpeg" />
+建議 4：<link rel="sitemap"> 加入 <head>
+雖然 robots.txt 已有 Sitemap 宣告，但在 <head> 內也加上有助於部分爬蟲發現：
+
+
+<link rel="sitemap" href="/sitemap-index.xml" />
